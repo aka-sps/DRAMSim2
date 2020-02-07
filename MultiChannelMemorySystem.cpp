@@ -34,9 +34,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "MultiChannelMemorySystem.h"
-#include "AddressMapping.h"
-#include "IniReader.h"
+#include "MultiChannelMemorySystem.hpp"
+#include "AddressMapping.hpp"
+#include "IniReader.hpp"
 
 
 

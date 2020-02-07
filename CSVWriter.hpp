@@ -27,8 +27,8 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-#ifndef _CSV_WRITER_H_
-#define _CSV_WRITER_H_
+#ifndef _CSV_WRITER_HPP_
+#define _CSV_WRITER_HPP_
 
 #include <stdio.h>
 #include <stdlib.h>

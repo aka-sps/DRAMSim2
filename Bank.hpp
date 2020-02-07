@@ -30,57 +30,53 @@
 
 
 
-#include <stdint.h> // uint64_t
 
-#ifndef CALLBACK_H
-#define CALLBACK_H
+
+
+
+
+#ifndef BANK_HPP
+#define BANK_HPP
+
+//Bank.hpp
+//
+//Header file for bank class
+//
+
+#include "SystemConfiguration.hpp"
+#include "SimulatorObject.hpp"
+#include "BankState.hpp"
+#include "BusPacket.hpp"
+#include <iostream>
 
 namespace DRAMSim
 {
-
-template <typename ReturnT, typename Param1T, typename Param2T,
-typename Param3T>
-class CallbackBase
+class Bank
 {
-public:
-	virtual ~CallbackBase() = 0;
-	virtual ReturnT operator()(Param1T, Param2T, Param3T) = 0;
-};
-
-template <typename Return, typename Param1T, typename Param2T, typename Param3T>
-DRAMSim::CallbackBase<Return,Param1T,Param2T,Param3T>::~CallbackBase() {}
-
-template <typename ConsumerT, typename ReturnT,
-typename Param1T, typename Param2T, typename Param3T >
-class Callback: public CallbackBase<ReturnT,Param1T,Param2T,Param3T>
-{
-private:
-	typedef ReturnT (ConsumerT::*PtrMember)(Param1T,Param2T,Param3T);
+	typedef struct _DataStruct
+	{
+		unsigned row;
+		void *data;
+		struct _DataStruct *next;
+	} DataStruct;
 
 public:
-	Callback( ConsumerT* const object, PtrMember member) :
-			object(object), member(member)
-	{
-	}
+	//functions
+	Bank(ostream &dramsim_log_);
+	void read(BusPacket *busPacket);
+	void write(const BusPacket *busPacket);
 
-	Callback( const Callback<ConsumerT,ReturnT,Param1T,Param2T,Param3T>& e ) :
-			object(e.object), member(e.member)
-	{
-	}
-
-	ReturnT operator()(Param1T param1, Param2T param2, Param3T param3)
-	{
-		return (const_cast<ConsumerT*>(object)->*member)
-		       (param1,param2,param3);
-	}
+	//fields
+	BankState currentState;
 
 private:
+	// private member
+	std::vector<DataStruct *> rowEntries;
+	ostream &dramsim_log; 
 
-	ConsumerT* const object;
-	const PtrMember  member;
+	static DataStruct *searchForRow(unsigned row, DataStruct *head);
 };
-
-typedef CallbackBase <void, unsigned, uint64_t, uint64_t> TransactionCompleteCB;
-} // namespace DRAMSim
+}
 
 #endif
+

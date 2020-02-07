@@ -31,53 +31,56 @@
 
 
 
+#ifndef RANK_HPP
+#define RANK_HPP
 
+#include "SimulatorObject.hpp"
+#include "BusPacket.hpp"
+#include "SystemConfiguration.hpp"
+#include "Bank.hpp"
+#include "BankState.hpp"
 
-
-
-#ifndef BANKSTATE_H
-#define BANKSTATE_H
-
-//BankState.h
-//
-//Header file for bank state class
-//
-
-#include "SystemConfiguration.h"
-#include "BusPacket.h"
+using namespace std;
+using namespace DRAMSim;
 
 namespace DRAMSim
 {
-enum CurrentBankState
+class MemoryController; //forward declaration
+class Rank : public SimulatorObject
 {
-	Idle,
-	RowActive,
-	Precharging,
-	Refreshing,
-	PowerDown
-};
-
-class BankState
-{
+private:
+	int id;
 	ostream &dramsim_log; 
+	unsigned incomingWriteBank;
+	unsigned incomingWriteRow;
+	unsigned incomingWriteColumn;
+	bool isPowerDown;
+
 public:
-	//Fields
-	CurrentBankState currentBankState;
-	unsigned openRowAddress;
-	uint64_t nextRead;
-	uint64_t nextWrite;
-	uint64_t nextActivate;
-	uint64_t nextPrecharge;
-	uint64_t nextPowerUp;
+	//functions
+	Rank(ostream &dramsim_log_);
+	virtual ~Rank(); 
+	void receiveFromBus(BusPacket *packet);
+	void attachMemoryController(MemoryController *mc);
+	int getId() const;
+	void setId(int id);
+	void update();
+	void powerUp();
+	void powerDown();
 
-	BusPacketType lastCommand;
-	unsigned stateChangeCountdown;
+	//fields
+	MemoryController *memoryController;
+	BusPacket *outgoingDataPacket;
+	unsigned dataCyclesLeft;
+	bool refreshWaiting;
 
-	//Functions
-	BankState(ostream &dramsim_log_);
-	void print();
+	//these are vectors so that each element is per-bank
+	vector<BusPacket *> readReturnPacket;
+	vector<unsigned> readReturnCountdown;
+	vector<Bank> banks;
+	vector<BankState> bankStates;
+
 };
 }
-
 #endif
 

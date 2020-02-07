@@ -36,8 +36,8 @@
 //Class file for JEDEC memory system wrapper
 //
 
-#include "MemorySystem.h"
-#include "IniReader.h"
+#include "MemorySystem.hpp"
+#include "IniReader.hpp"
 #include <unistd.h>
 
 using namespace std;

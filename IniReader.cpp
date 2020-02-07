@@ -35,11 +35,11 @@
 
 
 
-#include "IniReader.h"
+#include "IniReader.hpp"
 
 using namespace std;
 
-// these are the values that are extern'd in SystemConfig.h so that they
+// these are the values that are extern'd in SystemConfig.hpp so that they
 // have global scope even though they are set by IniReader
 
 uint64_t TOTAL_STORAGE;

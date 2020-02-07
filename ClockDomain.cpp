@@ -1,4 +1,4 @@
-#include "ClockDomain.h"
+#include "ClockDomain.hpp"
 
 using namespace std;
 

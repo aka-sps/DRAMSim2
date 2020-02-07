@@ -41,7 +41,7 @@
 //
 
 #include <cstdlib>
-#include "SimulatorObject.h"
+#include "SimulatorObject.hpp"
 
 using namespace DRAMSim;
 using namespace std;

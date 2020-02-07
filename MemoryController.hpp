@@ -29,22 +29,22 @@
 *********************************************************************************/
 
 
-#ifndef MEMORYCONTROLLER_H
-#define MEMORYCONTROLLER_H
+#ifndef MEMORYCONTROLLER_HPP
+#define MEMORYCONTROLLER_HPP
 
-//MemoryController.h
+//MemoryController.hpp
 //
 //Header file for memory controller object
 //
 
-#include "SimulatorObject.h"
-#include "Transaction.h"
-#include "SystemConfiguration.h"
-#include "CommandQueue.h"
-#include "BusPacket.h"
-#include "BankState.h"
-#include "Rank.h"
-#include "CSVWriter.h"
+#include "SimulatorObject.hpp"
+#include "Transaction.hpp"
+#include "SystemConfiguration.hpp"
+#include "CommandQueue.hpp"
+#include "BusPacket.hpp"
+#include "BankState.hpp"
+#include "Rank.hpp"
+#include "CSVWriter.hpp"
 #include <map>
 
 using namespace std;

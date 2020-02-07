@@ -33,8 +33,8 @@
 //Class file for bank object
 //
 
-#include "Bank.h"
-#include "BusPacket.h"
+#include "Bank.hpp"
+#include "BusPacket.hpp"
 
 using namespace std;
 using namespace DRAMSim;

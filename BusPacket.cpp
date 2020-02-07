@@ -40,7 +40,7 @@
 //Class file for bus packet object
 //
 
-#include "BusPacket.h"
+#include "BusPacket.hpp"
 
 using namespace DRAMSim;
 using namespace std;

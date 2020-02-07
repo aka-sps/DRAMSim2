@@ -27,32 +27,31 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-#include "SimulatorObject.h"
-#include "Transaction.h"
-#include "SystemConfiguration.h"
-#include "MemorySystem.h"
-#include "IniReader.h"
-#include "ClockDomain.h"
-#include "CSVWriter.h"
 
 
-namespace DRAMSim {
+#ifndef DRAMSIM_HPP
+#define DRAMSIM_HPP
+/*
+ * This is a public header for DRAMSim including this along with libdramsim.so should
+ * provide all necessary functionality to talk to an external simulator
+ */
+#include "Callback.hpp"
+#include <string>
+using std::string;
 
-
-class MultiChannelMemorySystem : public SimulatorObject 
+namespace DRAMSim 
 {
-	public: 
 
-	MultiChannelMemorySystem(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, string *visFilename=NULL, const IniReader::OverrideMap *paramOverrides=NULL);
-		virtual ~MultiChannelMemorySystem();
-			bool addTransaction(Transaction *trans);
-			bool addTransaction(const Transaction &trans);
+	class MultiChannelMemorySystem {
+		public: 
 			bool addTransaction(bool isWrite, uint64_t addr);
+			void setCPUClockSpeed(uint64_t cpuClkFreqHz);
+			void update();
+			void printStats(bool finalStats);
 			bool willAcceptTransaction(); 
 			bool willAcceptTransaction(uint64_t addr); 
-			void update();
-			void printStats(bool finalStats=false);
-			ostream &getLogFile();
+			std::ostream &getLogFile();
+
 			void RegisterCallbacks( 
 				TransactionCompleteCB *readDone,
 				TransactionCompleteCB *writeDone,
@@ -61,29 +60,8 @@ class MultiChannelMemorySystem : public SimulatorObject
 			int getIniUint(const std::string &field, unsigned int *val);
 			int getIniUint64(const std::string &field, uint64_t *val);
 			int getIniFloat(const std::string &field, float *val);
-
-	void InitOutputFiles(string tracefilename);
-	void setCPUClockSpeed(uint64_t cpuClkFreqHz);
-
-	//output file
-	std::ofstream visDataOut;
-	ofstream dramsim_log; 
-
-	private:
-		unsigned findChannelNumber(uint64_t addr);
-		void actual_update(); 
-		vector<MemorySystem*> channels; 
-		unsigned megsOfMemory; 
-		string deviceIniFilename;
-		string systemIniFilename;
-		string traceFilename;
-		string pwd;
-		string *visFilename;
-		ClockDomain::ClockDomainCrosser clockDomainCrosser; 
-		static void mkdirIfNotExist(string path);
-		static bool fileExists(string path); 
-		CSVWriter *csvOut; 
-
-
 	};
+	MultiChannelMemorySystem *getMemorySystemInstance(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, std::string *visfilename=NULL);
 }
+
+#endif

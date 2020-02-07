@@ -35,10 +35,10 @@
 
 
 
-#ifndef SIMULATOROBJ_H
-#define SIMULATOROBJ_H
+#ifndef SIMULATOROBJ_HPP
+#define SIMULATOROBJ_HPP
 
-//SimulatorObject.h
+//SimulatorObject.hpp
 //
 //Header file for simulator object class
 //

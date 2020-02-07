@@ -27,8 +27,8 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-#include "SystemConfiguration.h"
-#include "AddressMapping.h"
+#include "SystemConfiguration.hpp"
+#include "AddressMapping.hpp"
 
 namespace DRAMSim
 {

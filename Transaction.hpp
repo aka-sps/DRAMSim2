@@ -28,59 +28,86 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+#ifndef TRANSACTION_HPP
+#define TRANSACTION_HPP
 
+//Transaction.hpp
+//
+//Header file for transaction object
 
+#include "SystemConfiguration.hpp"
+#include "BusPacket.hpp"
 
-#ifndef RANK_H
-#define RANK_H
-
-#include "SimulatorObject.h"
-#include "BusPacket.h"
-#include "SystemConfiguration.h"
-#include "Bank.h"
-#include "BankState.h"
-
-using namespace std;
-using namespace DRAMSim;
+using std::ostream; 
 
 namespace DRAMSim
 {
-class MemoryController; //forward declaration
-class Rank : public SimulatorObject
+enum TransactionType
 {
-private:
-	int id;
-	ostream &dramsim_log; 
-	unsigned incomingWriteBank;
-	unsigned incomingWriteRow;
-	unsigned incomingWriteColumn;
-	bool isPowerDown;
-
-public:
-	//functions
-	Rank(ostream &dramsim_log_);
-	virtual ~Rank(); 
-	void receiveFromBus(BusPacket *packet);
-	void attachMemoryController(MemoryController *mc);
-	int getId() const;
-	void setId(int id);
-	void update();
-	void powerUp();
-	void powerDown();
-
-	//fields
-	MemoryController *memoryController;
-	BusPacket *outgoingDataPacket;
-	unsigned dataCyclesLeft;
-	bool refreshWaiting;
-
-	//these are vectors so that each element is per-bank
-	vector<BusPacket *> readReturnPacket;
-	vector<unsigned> readReturnCountdown;
-	vector<Bank> banks;
-	vector<BankState> bankStates;
-
+	DATA_READ,
+	DATA_WRITE,
+	RETURN_DATA
 };
+
+class Transaction
+{
+	Transaction();
+public:
+	//fields
+	TransactionType transactionType;
+	uint64_t address;
+	void *data;
+	uint64_t timeAdded;
+	uint64_t timeReturned;
+
+
+	friend ostream &operator<<(ostream &os, const Transaction &t);
+	//functions
+	Transaction(TransactionType transType, uint64_t addr, void *data);
+	Transaction(const Transaction &t);
+
+	BusPacketType getBusPacketType()
+	{
+		switch (transactionType)
+		{
+			case DATA_READ:
+			if (rowBufferPolicy == ClosePage)
+			{
+				return READ_P;
+			}
+			else if (rowBufferPolicy == OpenPage)
+			{
+				return READ; 
+			}
+			else
+			{
+				ERROR("Unknown row buffer policy");
+				abort();
+			}
+			break;
+		case DATA_WRITE:
+			if (rowBufferPolicy == ClosePage)
+			{
+				return WRITE_P;
+			}
+			else if (rowBufferPolicy == OpenPage)
+			{
+				return WRITE; 
+			}
+			else
+			{
+				ERROR("Unknown row buffer policy");
+				abort();
+			}
+			break;
+		default:
+			ERROR("This transaction type doesn't have a corresponding bus packet type");
+			abort();
+		}
+	}
+};
+
 }
+
 #endif
 

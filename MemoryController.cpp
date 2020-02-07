@@ -35,9 +35,9 @@
 //Class file for memory controller object
 //
 
-#include "MemoryController.h"
-#include "MemorySystem.h"
-#include "AddressMapping.h"
+#include "MemoryController.hpp"
+#include "MemorySystem.hpp"
+#include "AddressMapping.hpp"
 
 #define SEQUENTIAL(rank,bank) (rank*NUM_BANKS)+bank
 

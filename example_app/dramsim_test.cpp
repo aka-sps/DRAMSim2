@@ -32,7 +32,7 @@
 
 
 #include <stdio.h>
-#include "dramsim_test.h"
+#include "dramsim_test.hpp"
 
 using namespace DRAMSim;
 

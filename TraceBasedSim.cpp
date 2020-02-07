@@ -42,11 +42,11 @@
 #include <map>
 #include <list>
 
-#include "SystemConfiguration.h"
-#include "MemorySystem.h"
-#include "MultiChannelMemorySystem.h"
-#include "Transaction.h"
-#include "IniReader.h"
+#include "SystemConfiguration.hpp"
+#include "MemorySystem.hpp"
+#include "MultiChannelMemorySystem.hpp"
+#include "Transaction.hpp"
+#include "IniReader.hpp"
 
 
 using namespace DRAMSim;

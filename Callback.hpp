@@ -30,15 +30,57 @@
 
 
 
+#include <stdint.h> // uint64_t
 
-#include <string>
-#include <stdint.h>
-#include <DRAMSim.h>
+#ifndef CALLBACK_HPP
+#define CALLBACK_HPP
 
-class some_object
+namespace DRAMSim
 {
-	public: 
-		void read_complete(unsigned, uint64_t, uint64_t);
-		void write_complete(unsigned, uint64_t, uint64_t);
-		int add_one_and_run(DRAMSim::MultiChannelMemorySystem *mem, uint64_t addr);
+
+template <typename ReturnT, typename Param1T, typename Param2T,
+typename Param3T>
+class CallbackBase
+{
+public:
+	virtual ~CallbackBase() = 0;
+	virtual ReturnT operator()(Param1T, Param2T, Param3T) = 0;
 };
+
+template <typename Return, typename Param1T, typename Param2T, typename Param3T>
+DRAMSim::CallbackBase<Return,Param1T,Param2T,Param3T>::~CallbackBase() {}
+
+template <typename ConsumerT, typename ReturnT,
+typename Param1T, typename Param2T, typename Param3T >
+class Callback: public CallbackBase<ReturnT,Param1T,Param2T,Param3T>
+{
+private:
+	typedef ReturnT (ConsumerT::*PtrMember)(Param1T,Param2T,Param3T);
+
+public:
+	Callback( ConsumerT* const object, PtrMember member) :
+			object(object), member(member)
+	{
+	}
+
+	Callback( const Callback<ConsumerT,ReturnT,Param1T,Param2T,Param3T>& e ) :
+			object(e.object), member(e.member)
+	{
+	}
+
+	ReturnT operator()(Param1T param1, Param2T param2, Param3T param3)
+	{
+		return (const_cast<ConsumerT*>(object)->*member)
+		       (param1,param2,param3);
+	}
+
+private:
+
+	ConsumerT* const object;
+	const PtrMember  member;
+};
+
+typedef CallbackBase <void, unsigned, uint64_t, uint64_t> TransactionCompleteCB;
+} // namespace DRAMSim
+
+#endif

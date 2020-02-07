@@ -27,31 +27,32 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
+#include "SimulatorObject.hpp"
+#include "Transaction.hpp"
+#include "SystemConfiguration.hpp"
+#include "MemorySystem.hpp"
+#include "IniReader.hpp"
+#include "ClockDomain.hpp"
+#include "CSVWriter.hpp"
 
 
-#ifndef DRAMSIM_H
-#define DRAMSIM_H
-/*
- * This is a public header for DRAMSim including this along with libdramsim.so should
- * provide all necessary functionality to talk to an external simulator
- */
-#include "Callback.h"
-#include <string>
-using std::string;
+namespace DRAMSim {
 
-namespace DRAMSim 
+
+class MultiChannelMemorySystem : public SimulatorObject 
 {
+	public: 
 
-	class MultiChannelMemorySystem {
-		public: 
+	MultiChannelMemorySystem(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, string *visFilename=NULL, const IniReader::OverrideMap *paramOverrides=NULL);
+		virtual ~MultiChannelMemorySystem();
+			bool addTransaction(Transaction *trans);
+			bool addTransaction(const Transaction &trans);
 			bool addTransaction(bool isWrite, uint64_t addr);
-			void setCPUClockSpeed(uint64_t cpuClkFreqHz);
-			void update();
-			void printStats(bool finalStats);
 			bool willAcceptTransaction(); 
 			bool willAcceptTransaction(uint64_t addr); 
-			std::ostream &getLogFile();
-
+			void update();
+			void printStats(bool finalStats=false);
+			ostream &getLogFile();
 			void RegisterCallbacks( 
 				TransactionCompleteCB *readDone,
 				TransactionCompleteCB *writeDone,
@@ -60,8 +61,29 @@ namespace DRAMSim
 			int getIniUint(const std::string &field, unsigned int *val);
 			int getIniUint64(const std::string &field, uint64_t *val);
 			int getIniFloat(const std::string &field, float *val);
-	};
-	MultiChannelMemorySystem *getMemorySystemInstance(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, std::string *visfilename=NULL);
-}
 
-#endif
+	void InitOutputFiles(string tracefilename);
+	void setCPUClockSpeed(uint64_t cpuClkFreqHz);
+
+	//output file
+	std::ofstream visDataOut;
+	ofstream dramsim_log; 
+
+	private:
+		unsigned findChannelNumber(uint64_t addr);
+		void actual_update(); 
+		vector<MemorySystem*> channels; 
+		unsigned megsOfMemory; 
+		string deviceIniFilename;
+		string systemIniFilename;
+		string traceFilename;
+		string pwd;
+		string *visFilename;
+		ClockDomain::ClockDomainCrosser clockDomainCrosser; 
+		static void mkdirIfNotExist(string path);
+		static bool fileExists(string path); 
+		CSVWriter *csvOut; 
+
+
+	};
+}

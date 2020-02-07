@@ -40,8 +40,8 @@
 //Class file for command queue object
 //
 
-#include "CommandQueue.h"
-#include "MemoryController.h"
+#include "CommandQueue.hpp"
+#include "MemoryController.hpp"
 #include <assert.h>
 
 using namespace DRAMSim;

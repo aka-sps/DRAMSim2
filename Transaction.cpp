@@ -34,8 +34,8 @@
 //	Transaction is considered requests sent from the CPU to
 //	the memory controller (read, write, etc.)...
 
-#include "Transaction.h"
-#include "PrintMacros.h"
+#include "Transaction.hpp"
+#include "PrintMacros.hpp"
 
 using std::endl;
 using std::hex; 

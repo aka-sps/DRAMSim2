@@ -28,53 +28,50 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
-
-
-
-
-
-
-
-#ifndef BANK_H
-#define BANK_H
-
-//Bank.h
+#ifndef BUSPACKET_HPP
+#define BUSPACKET_HPP
+//BusPacket.hpp
 //
-//Header file for bank class
+//Header file for bus packet object
 //
 
-#include "SystemConfiguration.h"
-#include "SimulatorObject.h"
-#include "BankState.h"
-#include "BusPacket.h"
-#include <iostream>
+#include "SystemConfiguration.hpp"
 
 namespace DRAMSim
 {
-class Bank
+enum BusPacketType
 {
-	typedef struct _DataStruct
-	{
-		unsigned row;
-		void *data;
-		struct _DataStruct *next;
-	} DataStruct;
+	READ,
+	READ_P,
+	WRITE,
+	WRITE_P,
+	ACTIVATE,
+	PRECHARGE,
+	REFRESH,
+	DATA
+};
 
-public:
-	//functions
-	Bank(ostream &dramsim_log_);
-	void read(BusPacket *busPacket);
-	void write(const BusPacket *busPacket);
-
-	//fields
-	BankState currentState;
-
-private:
-	// private member
-	std::vector<DataStruct *> rowEntries;
+class BusPacket
+{
+	BusPacket();
 	ostream &dramsim_log; 
+public:
+	//Fields
+	BusPacketType busPacketType;
+	unsigned column;
+	unsigned row;
+	unsigned bank;
+	unsigned rank;
+	uint64_t physicalAddress;
+	void *data;
 
-	static DataStruct *searchForRow(unsigned row, DataStruct *head);
+	//Functions
+	BusPacket(BusPacketType packtype, uint64_t physicalAddr, unsigned col, unsigned rw, unsigned r, unsigned b, void *dat, ostream &dramsim_log_);
+
+	void print();
+	void print(uint64_t currentClockCycle, bool dataStart);
+	void printData() const;
+
 };
 }
 

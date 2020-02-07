@@ -31,8 +31,8 @@
 
 
 
-#include "Rank.h"
-#include "MemoryController.h"
+#include "Rank.hpp"
+#include "MemoryController.hpp"
 
 using namespace std;
 using namespace DRAMSim;

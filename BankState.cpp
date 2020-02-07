@@ -40,7 +40,7 @@
 //Class file for bank state object
 //
 
-#include "BankState.h"
+#include "BankState.hpp"
 
 using namespace std;
 using namespace DRAMSim;

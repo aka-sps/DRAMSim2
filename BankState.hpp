@@ -32,40 +32,52 @@
 
 
 
-#ifndef PRINT_MACROS_H
-#define PRINT_MACROS_H
 
-#include <iostream>
 
-extern int SHOW_SIM_OUTPUT;
 
-#define ERROR(str) std::cerr<<"[ERROR ("<<__FILE__<<":"<<__LINE__<<")]: "<<str<<std::endl;
+#ifndef BANKSTATE_HPP
+#define BANKSTATE_HPP
 
-using std::ostream;
+//BankState.hpp
+//
+//Header file for bank state class
+//
 
-#ifdef DEBUG_BUILD
-	#define DEBUG(str)  std::cerr<< str <<std::endl;
-	#define DEBUGN(str) std::cerr<< str;
-#else
-	#define DEBUG(str) ;
-	#define DEBUGN(str) ;
+#include "SystemConfiguration.hpp"
+#include "BusPacket.hpp"
+
+namespace DRAMSim
+{
+enum CurrentBankState
+{
+	Idle,
+	RowActive,
+	Precharging,
+	Refreshing,
+	PowerDown
+};
+
+class BankState
+{
+	ostream &dramsim_log; 
+public:
+	//Fields
+	CurrentBankState currentBankState;
+	unsigned openRowAddress;
+	uint64_t nextRead;
+	uint64_t nextWrite;
+	uint64_t nextActivate;
+	uint64_t nextPrecharge;
+	uint64_t nextPowerUp;
+
+	BusPacketType lastCommand;
+	unsigned stateChangeCountdown;
+
+	//Functions
+	BankState(ostream &dramsim_log_);
+	void print();
+};
+}
+
 #endif
 
-#ifdef NO_OUTPUT
-	#undef DEBUG
-	#undef DEBUGN
-	#define DEBUG(str) ;
-	#define DEBUGN(str) ;
-	#define PRINT(str) ;
-	#define PRINTN(str) ;
-#else
-	#ifdef LOG_OUTPUT
-		#define PRINT(str)  { dramsim_log <<str<<std::endl; }
-		#define PRINTN(str) { dramsim_log <<str; }
-	#else
-		#define PRINT(str)  if(SHOW_SIM_OUTPUT) { std::cout <<str<<std::endl; }
-		#define PRINTN(str) if(SHOW_SIM_OUTPUT) { std::cout <<str; }
-	#endif
-#endif
-
-#endif /*PRINT_MACROS_H*/

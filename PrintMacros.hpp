@@ -28,52 +28,44 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
-#ifndef BUSPACKET_H
-#define BUSPACKET_H
-//BusPacket.h
-//
-//Header file for bus packet object
-//
 
-#include "SystemConfiguration.h"
 
-namespace DRAMSim
-{
-enum BusPacketType
-{
-	READ,
-	READ_P,
-	WRITE,
-	WRITE_P,
-	ACTIVATE,
-	PRECHARGE,
-	REFRESH,
-	DATA
-};
 
-class BusPacket
-{
-	BusPacket();
-	ostream &dramsim_log; 
-public:
-	//Fields
-	BusPacketType busPacketType;
-	unsigned column;
-	unsigned row;
-	unsigned bank;
-	unsigned rank;
-	uint64_t physicalAddress;
-	void *data;
 
-	//Functions
-	BusPacket(BusPacketType packtype, uint64_t physicalAddr, unsigned col, unsigned rw, unsigned r, unsigned b, void *dat, ostream &dramsim_log_);
+#ifndef PRINT_MACROS_HPP
+#define PRINT_MACROS_HPP
 
-	void print();
-	void print(uint64_t currentClockCycle, bool dataStart);
-	void printData() const;
+#include <iostream>
 
-};
-}
+extern int SHOW_SIM_OUTPUT;
 
+#define ERROR(str) std::cerr<<"[ERROR ("<<__FILE__<<":"<<__LINE__<<")]: "<<str<<std::endl;
+
+using std::ostream;
+
+#ifdef DEBUG_BUILD
+	#define DEBUG(str)  std::cerr<< str <<std::endl;
+	#define DEBUGN(str) std::cerr<< str;
+#else
+	#define DEBUG(str) ;
+	#define DEBUGN(str) ;
 #endif
 
+#ifdef NO_OUTPUT
+	#undef DEBUG
+	#undef DEBUGN
+	#define DEBUG(str) ;
+	#define DEBUGN(str) ;
+	#define PRINT(str) ;
+	#define PRINTN(str) ;
+#else
+	#ifdef LOG_OUTPUT
+		#define PRINT(str)  { dramsim_log <<str<<std::endl; }
+		#define PRINTN(str) { dramsim_log <<str; }
+	#else
+		#define PRINT(str)  if(SHOW_SIM_OUTPUT) { std::cout <<str<<std::endl; }
+		#define PRINTN(str) if(SHOW_SIM_OUTPUT) { std::cout <<str; }
+	#endif
+#endif
+
+#endif /*PRINT_MACROS_H*/

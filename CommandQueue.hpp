@@ -30,58 +30,71 @@
 
 
 
-#ifndef MEMORYSYSTEM_H
-#define MEMORYSYSTEM_H
 
-//MemorySystem.h
+
+
+#ifndef CMDQUEUE_HPP
+#define CMDQUEUE_HPP
+
+//CommandQueue.hpp
 //
-//Header file for JEDEC memory system wrapper
+//Header
 //
 
-#include "SimulatorObject.h"
-#include "SystemConfiguration.h"
-#include "MemoryController.h"
-#include "Rank.h"
-#include "Transaction.h"
-#include "Callback.h"
-#include "CSVWriter.h"
-#include <deque>
+#include "BusPacket.hpp"
+#include "BankState.hpp"
+#include "Transaction.hpp"
+#include "SystemConfiguration.hpp"
+#include "SimulatorObject.hpp"
+
+using namespace std;
 
 namespace DRAMSim
 {
-typedef CallbackBase<void,unsigned,uint64_t,uint64_t> Callback_t;
-class MemorySystem : public SimulatorObject
+class CommandQueue : public SimulatorObject
 {
+	CommandQueue();
 	ostream &dramsim_log;
 public:
+	//typedefs
+	typedef vector<BusPacket *> BusPacket1D;
+	typedef vector<BusPacket1D> BusPacket2D;
+	typedef vector<BusPacket2D> BusPacket3D;
+
 	//functions
-	MemorySystem(unsigned id, unsigned megsOfMemory, CSVWriter &csvOut_, ostream &dramsim_log_);
-	virtual ~MemorySystem();
-	void update();
-	bool addTransaction(Transaction *trans);
-	bool addTransaction(bool isWrite, uint64_t addr);
-	void printStats(bool finalStats);
-	bool WillAcceptTransaction();
-	void RegisterCallbacks(
-	    Callback_t *readDone,
-	    Callback_t *writeDone,
-	    void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
+	CommandQueue(vector< vector<BankState> > &states, ostream &dramsim_log);
+	virtual ~CommandQueue(); 
+
+	void enqueue(BusPacket *newBusPacket);
+	bool pop(BusPacket **busPacket);
+	bool hasRoomFor(unsigned numberToEnqueue, unsigned rank, unsigned bank);
+	bool isIssuable(BusPacket *busPacket);
+	bool isEmpty(unsigned rank);
+	void needRefresh(unsigned rank);
+	void print();
+	void update(); //SimulatorObject requirement
+	vector<BusPacket *> &getCommandQueue(unsigned rank, unsigned bank);
 
 	//fields
-	MemoryController *memoryController;
-	vector<Rank *> *ranks;
-	deque<Transaction *> pendingTransactions; 
-
-
-	//function pointers
-	Callback_t* ReturnReadData;
-	Callback_t* WriteDataDone;
-	//TODO: make this a functor as well?
-	static powerCallBack_t ReportPower;
-	unsigned systemID;
-
+	
+	BusPacket3D queues; // 3D array of BusPacket pointers
+	vector< vector<BankState> > &bankStates;
 private:
-	CSVWriter &csvOut;
+	void nextRankAndBank(unsigned &rank, unsigned &bank);
+	//fields
+	unsigned nextBank;
+	unsigned nextRank;
+
+	unsigned nextBankPRE;
+	unsigned nextRankPRE;
+
+	unsigned refreshRank;
+	bool refreshWaiting;
+
+	vector< vector<unsigned> > tFAWCountdown;
+	vector< vector<unsigned> > rowAccessCounters;
+
+	bool sendAct;
 };
 }
 

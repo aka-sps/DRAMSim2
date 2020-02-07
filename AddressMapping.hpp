@@ -27,87 +27,11 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-#ifndef TRANSACTION_H
-#define TRANSACTION_H
-
-//Transaction.h
-//
-//Header file for transaction object
-
-#include "SystemConfiguration.h"
-#include "BusPacket.h"
-
-using std::ostream; 
-
+#ifndef ADDRESS_MAPPING_HPP
+#define ADDRESS_MAPPING_HPP
 namespace DRAMSim
 {
-enum TransactionType
-{
-	DATA_READ,
-	DATA_WRITE,
-	RETURN_DATA
-};
-
-class Transaction
-{
-	Transaction();
-public:
-	//fields
-	TransactionType transactionType;
-	uint64_t address;
-	void *data;
-	uint64_t timeAdded;
-	uint64_t timeReturned;
-
-
-	friend ostream &operator<<(ostream &os, const Transaction &t);
-	//functions
-	Transaction(TransactionType transType, uint64_t addr, void *data);
-	Transaction(const Transaction &t);
-
-	BusPacketType getBusPacketType()
-	{
-		switch (transactionType)
-		{
-			case DATA_READ:
-			if (rowBufferPolicy == ClosePage)
-			{
-				return READ_P;
-			}
-			else if (rowBufferPolicy == OpenPage)
-			{
-				return READ; 
-			}
-			else
-			{
-				ERROR("Unknown row buffer policy");
-				abort();
-			}
-			break;
-		case DATA_WRITE:
-			if (rowBufferPolicy == ClosePage)
-			{
-				return WRITE_P;
-			}
-			else if (rowBufferPolicy == OpenPage)
-			{
-				return WRITE; 
-			}
-			else
-			{
-				ERROR("Unknown row buffer policy");
-				abort();
-			}
-			break;
-		default:
-			ERROR("This transaction type doesn't have a corresponding bus packet type");
-			abort();
-		}
-	}
-};
-
+	void addressMapping(uint64_t physicalAddress, unsigned &channel, unsigned &rank, unsigned &bank, unsigned &row, unsigned &col);
 }
 
 #endif
-

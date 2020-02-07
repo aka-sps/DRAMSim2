@@ -28,62 +28,62 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
-#ifndef INIREADER_H
-#define INIREADER_H
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <map> 
-#include "SystemConfiguration.h"
 
-using namespace std;
+#ifndef MEMORYSYSTEM_HPP
+#define MEMORYSYSTEM_HPP
 
-#define DEFINE_UINT_PARAM(name, paramtype) {#name, &name, UINT, paramtype, false}
-#define DEFINE_STRING_PARAM(name, paramtype) {#name, &name, STRING, paramtype, false}
-#define DEFINE_FLOAT_PARAM(name,paramtype) {#name, &name, FLOAT, paramtype, false}
-#define DEFINE_BOOL_PARAM(name, paramtype) {#name, &name, BOOL, paramtype, false}
-#define DEFINE_UINT64_PARAM(name, paramtype) {#name, &name, UINT64, paramtype, false}
+//MemorySystem.hpp
+//
+//Header file for JEDEC memory system wrapper
+//
+
+#include "SimulatorObject.hpp"
+#include "SystemConfiguration.hpp"
+#include "MemoryController.hpp"
+#include "Rank.hpp"
+#include "Transaction.hpp"
+#include "Callback.hpp"
+#include "CSVWriter.hpp"
+#include <deque>
 
 namespace DRAMSim
 {
-
-typedef enum _variableType {STRING, UINT, UINT64, FLOAT, BOOL} varType;
-typedef enum _paramType {SYS_PARAM, DEV_PARAM} paramType;
-typedef struct _configMap
+typedef CallbackBase<void,unsigned,uint64_t,uint64_t> Callback_t;
+class MemorySystem : public SimulatorObject
 {
-	string iniKey; //for example "tRCD"
-
-	void *variablePtr;
-	varType variableType;
-	paramType parameterType;
-	bool wasSet;
-} ConfigMap;
-
-class IniReader
-{
-
+	ostream &dramsim_log;
 public:
-	typedef std::map<string, string> OverrideMap;
-	typedef OverrideMap::const_iterator OverrideIterator; 
+	//functions
+	MemorySystem(unsigned id, unsigned megsOfMemory, CSVWriter &csvOut_, ostream &dramsim_log_);
+	virtual ~MemorySystem();
+	void update();
+	bool addTransaction(Transaction *trans);
+	bool addTransaction(bool isWrite, uint64_t addr);
+	void printStats(bool finalStats);
+	bool WillAcceptTransaction();
+	void RegisterCallbacks(
+	    Callback_t *readDone,
+	    Callback_t *writeDone,
+	    void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
 
-	static void SetKey(string key, string value, bool isSystemParam = false, size_t lineNumber = 0);
-	static void OverrideKeys(const OverrideMap *map);
-	static void ReadIniFile(string filename, bool isSystemParam);
-	static void InitEnumsFromStrings();
-	static bool CheckIfAllSet();
-	static void WriteValuesOut(std::ofstream &visDataOut);
-	static int getBool(const std::string &field, bool *val);
-	static int getUint(const std::string &field, unsigned int *val);
-	static int getUint64(const std::string &field, uint64_t *val);
-	static int getFloat(const std::string &field, float *val);
+	//fields
+	MemoryController *memoryController;
+	vector<Rank *> *ranks;
+	deque<Transaction *> pendingTransactions; 
+
+
+	//function pointers
+	Callback_t* ReturnReadData;
+	Callback_t* WriteDataDone;
+	//TODO: make this a functor as well?
+	static powerCallBack_t ReportPower;
+	unsigned systemID;
 
 private:
-	static void WriteParams(std::ofstream &visDataOut, paramType t);
-	static void Trim(string &str);
+	CSVWriter &csvOut;
 };
 }
 
-
 #endif
+

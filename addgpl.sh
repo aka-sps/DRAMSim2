@@ -1,6 +1,6 @@
 #!/bin/bash 
 
-#script to add or remove the GPL header from all *.cpp and *.h files
+#script to add or remove the GPL header from all *.cpp and *.hpp files
 # in a directory. Usage:
 #
 # ./addgpl.sh [add|remove] directory/
@@ -9,7 +9,7 @@
 DIRECTORY=$2
 
 if [ -d "$DIRECTORY" ]; then 
-	FILES=`find $DIRECTORY -iname '*.h' -or -iname '*.cpp'`
+	FILES=`find $DIRECTORY -iname '*.hpp' -or -iname '*.cpp'`
 else
 	echo "Bad directory"
 	exit

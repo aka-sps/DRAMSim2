@@ -28,75 +28,62 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+#ifndef INIREADER_HPP
+#define INIREADER_HPP
 
-
-
-
-
-#ifndef CMDQUEUE_H
-#define CMDQUEUE_H
-
-//CommandQueue.h
-//
-//Header
-//
-
-#include "BusPacket.h"
-#include "BankState.h"
-#include "Transaction.h"
-#include "SystemConfiguration.h"
-#include "SimulatorObject.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <map> 
+#include "SystemConfiguration.hpp"
 
 using namespace std;
 
+#define DEFINE_UINT_PARAM(name, paramtype) {#name, &name, UINT, paramtype, false}
+#define DEFINE_STRING_PARAM(name, paramtype) {#name, &name, STRING, paramtype, false}
+#define DEFINE_FLOAT_PARAM(name,paramtype) {#name, &name, FLOAT, paramtype, false}
+#define DEFINE_BOOL_PARAM(name, paramtype) {#name, &name, BOOL, paramtype, false}
+#define DEFINE_UINT64_PARAM(name, paramtype) {#name, &name, UINT64, paramtype, false}
+
 namespace DRAMSim
 {
-class CommandQueue : public SimulatorObject
+
+typedef enum _variableType {STRING, UINT, UINT64, FLOAT, BOOL} varType;
+typedef enum _paramType {SYS_PARAM, DEV_PARAM} paramType;
+typedef struct _configMap
 {
-	CommandQueue();
-	ostream &dramsim_log;
+	string iniKey; //for example "tRCD"
+
+	void *variablePtr;
+	varType variableType;
+	paramType parameterType;
+	bool wasSet;
+} ConfigMap;
+
+class IniReader
+{
+
 public:
-	//typedefs
-	typedef vector<BusPacket *> BusPacket1D;
-	typedef vector<BusPacket1D> BusPacket2D;
-	typedef vector<BusPacket2D> BusPacket3D;
+	typedef std::map<string, string> OverrideMap;
+	typedef OverrideMap::const_iterator OverrideIterator; 
 
-	//functions
-	CommandQueue(vector< vector<BankState> > &states, ostream &dramsim_log);
-	virtual ~CommandQueue(); 
+	static void SetKey(string key, string value, bool isSystemParam = false, size_t lineNumber = 0);
+	static void OverrideKeys(const OverrideMap *map);
+	static void ReadIniFile(string filename, bool isSystemParam);
+	static void InitEnumsFromStrings();
+	static bool CheckIfAllSet();
+	static void WriteValuesOut(std::ofstream &visDataOut);
+	static int getBool(const std::string &field, bool *val);
+	static int getUint(const std::string &field, unsigned int *val);
+	static int getUint64(const std::string &field, uint64_t *val);
+	static int getFloat(const std::string &field, float *val);
 
-	void enqueue(BusPacket *newBusPacket);
-	bool pop(BusPacket **busPacket);
-	bool hasRoomFor(unsigned numberToEnqueue, unsigned rank, unsigned bank);
-	bool isIssuable(BusPacket *busPacket);
-	bool isEmpty(unsigned rank);
-	void needRefresh(unsigned rank);
-	void print();
-	void update(); //SimulatorObject requirement
-	vector<BusPacket *> &getCommandQueue(unsigned rank, unsigned bank);
-
-	//fields
-	
-	BusPacket3D queues; // 3D array of BusPacket pointers
-	vector< vector<BankState> > &bankStates;
 private:
-	void nextRankAndBank(unsigned &rank, unsigned &bank);
-	//fields
-	unsigned nextBank;
-	unsigned nextRank;
-
-	unsigned nextBankPRE;
-	unsigned nextRankPRE;
-
-	unsigned refreshRank;
-	bool refreshWaiting;
-
-	vector< vector<unsigned> > tFAWCountdown;
-	vector< vector<unsigned> > rowAccessCounters;
-
-	bool sendAct;
+	static void WriteParams(std::ofstream &visDataOut, paramType t);
+	static void Trim(string &str);
 };
 }
 
-#endif
 
+#endif

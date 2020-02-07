@@ -30,8 +30,8 @@
 
 
 
-#ifndef SYSCONFIG_H
-#define SYSCONFIG_H
+#ifndef SYSCONFIG_HPP
+#define SYSCONFIG_HPP
 
 #include <iostream>
 #include <fstream>
@@ -39,13 +39,13 @@
 #include <string>
 #include <cstdlib>
 #include <stdint.h>
-#include "PrintMacros.h"
+#include "PrintMacros.hpp"
 
 #ifdef __APPLE__
 #include <sys/types.h>
 #endif
 
-//SystemConfiguration.h
+//SystemConfiguration.hpp
 //
 //Configuration values for the current system
 
