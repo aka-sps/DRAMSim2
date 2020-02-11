@@ -4,7 +4,7 @@ project(DRAMSim2)
 
 set(DRAMSIM_NO_STORAGE ON CACHE BOOL "")
 
-option(BUILD_SHARED_LIBS "" ON)
+# option(BUILD_SHARED_LIBS "" ON)
 
 enable_testing()
 
