@@ -58,7 +58,7 @@ void addressMapping(uint64_t physicalAddress, unsigned &newTransactionChan, unsi
 	physicalAddress >>= byteOffsetWidth;
 
 	// The next thing we have to consider is that when a request is made for a
-	// we've taken into account the granulaity of a single burst by shifting 
+	// we've taken into account the granularity of a single burst by shifting
 	// off the bottom 3 bits, but a transaction has to take into account the
 	// burst length (i.e. the requests will be aligned to cache line sizes which
 	// should be equal to transactionSize above). 

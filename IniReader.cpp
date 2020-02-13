@@ -454,7 +454,7 @@ void IniReader::OverrideKeys(const OverrideMap *map)
 
 bool IniReader::CheckIfAllSet()
 {
-	// check to make sure all parameters that we exepected were set
+	// check to make sure all parameters that we expected were set
 	for (size_t i=0; configMap[i].variablePtr != NULL; i++)
 	{
 		if (!configMap[i].wasSet)

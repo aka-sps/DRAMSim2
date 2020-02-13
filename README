@@ -15,7 +15,7 @@ DRAMSim
 	The overarching goal is to have a simulator that is extremely small,
 	portable, and accurate. The simulator core has a well-defined interface
 	which allows it to be CPU simulator agnostic and should be easily
-	modifiably to work with any simulator.  This core has no external run
+	modifiable to work with any simulator.  This core has no external run
 	time or build time dependencies and has been tested with g++ on Linux
 	as well as g++ on Cygwin on Windows.  
 

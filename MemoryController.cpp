@@ -130,7 +130,7 @@ void MemoryController::receiveFromBus(BusPacket *bpacket)
 	returnTransaction.push_back(new Transaction(RETURN_DATA, bpacket->physicalAddress, bpacket->data));
 	totalReadsPerBank[SEQUENTIAL(bpacket->rank,bpacket->bank)]++;
 
-	// this delete statement saves a mindboggling amount of memory
+	// this delete statement saves a mind-boggling amount of memory
 	delete(bpacket);
 }
 
@@ -603,7 +603,7 @@ void MemoryController::update()
 				}
 			}
 			//if there IS something in the queue or there IS a refresh waiting (and we can power up), do it
-			else if (currentClockCycle >= bankStates[i][0].nextPowerUp && powerDown[i]) //use 0 since theyre all the same
+			else if (currentClockCycle >= bankStates[i][0].nextPowerUp && powerDown[i]) //use 0 since they are all the same
 			{
 				powerDown[i] = false;
 				(*ranks)[i]->powerUp();

@@ -15,7 +15,7 @@ outfile = open(tracefile_filename,"w")
 temp_trace = tracefile_filename + ".temp"
 
 zcat_cmd = "zcat";
-# accomodate OSX
+# accommodate OSX
 if os.uname()[0] == "Darwin":
 	print "Detected OSX, using gzcat..."
 	zcat_cmd = "gzcat"

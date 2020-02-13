@@ -60,7 +60,7 @@ CommandQueue::CommandQueue(vector< vector<BankState> > &states, ostream &dramsim
 	//set here to avoid compile errors
 	currentClockCycle = 0;
 
-	//use numBankQueus below to create queue structure
+	//use numBankQueues below to create queue structure
 	size_t numBankQueues;
 	if (queuingStructure==PerRank)
 	{
@@ -259,7 +259,7 @@ bool CommandQueue::pop(BusPacket **busPacket)
 				vector<BusPacket *> &queue = getCommandQueue(nextRank, nextBank);
 				//make sure there is something in this queue first
 				//	also make sure a rank isn't waiting for a refresh
-				//	if a rank is waiting for a refesh, don't issue anything to it until the
+				//	if a rank is waiting for a refresh, don't issue anything to it until the
 				//		refresh logic above has sent one out (ie, letting banks close)
 				if (!queue.empty() && !((nextRank == refreshRank) && refreshWaiting))
 				{
@@ -437,7 +437,7 @@ bool CommandQueue::pop(BusPacket **busPacket)
 
 							//if the bus packet before is an activate, that is the act that was
 							//	paired with the column access we are removing, so we have to remove
-							//	that activate as well (check i>0 because if i==0 then theres nothing before it)
+							//	that activate as well (check i>0 because if i==0 then there is nothing before it)
 							if (i>0 && queue[i-1]->busPacketType == ACTIVATE)
 							{
 								rowAccessCounters[(*busPacket)->rank][(*busPacket)->bank]++;
@@ -509,7 +509,7 @@ bool CommandQueue::pop(BusPacket **busPacket)
 							}
 						}
 
-						//if nothing found going to that bank and row or too many accesses have happend, close it
+						//if nothing found going to that bank and row or too many accesses have happened, close it
 						if (!found || rowAccessCounters[nextRankPRE][nextBankPRE]==TOTAL_ROW_ACCESSES)
 						{
 							if (currentClockCycle >= bankStates[nextRankPRE][nextBankPRE].nextPrecharge)
@@ -706,7 +706,7 @@ bool CommandQueue::isEmpty(unsigned rank)
 	}
 	else
 	{
-		DEBUG("Invalid Queueing Stucture");
+		DEBUG("Invalid Queueing Structure");
 		abort();
 	}
 }
