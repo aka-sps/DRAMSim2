@@ -8,4 +8,8 @@
  * The DRAMSim libraries do not include the TraceBasedSim object and thus
  * library users can optionally override the weak definition below.
  */
-int __attribute__((weak)) SHOW_SIM_OUTPUT = false;
+#ifndef _SIM_
+int SHOW_SIM_OUTPUT = 1;
+#else
+int SHOW_SIM_OUTPUT = 0;
+#endif

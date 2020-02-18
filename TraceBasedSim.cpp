@@ -55,7 +55,6 @@ using namespace std;
 //#define RETURN_TRANSACTIONS 1
 
 #ifndef _SIM_
-int SHOW_SIM_OUTPUT = 1;
 ofstream visDataOut; //mostly used in MemoryController
 
 #ifdef RETURN_TRANSACTIONS
