@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,76 +27,79 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
-
-
-
 #ifndef CMDQUEUE_HPP
 #define CMDQUEUE_HPP
 
-//CommandQueue.hpp
-//
-//Header
-//
-
-#include "BusPacket.hpp"
 #include "BankState.hpp"
 #include "Transaction.hpp"
-#include "SystemConfiguration.hpp"
 #include "SimulatorObject.hpp"
 
-using namespace std;
+#include <vector>
 
-namespace DRAMSim
+namespace DRAMSim {
+class CommandQueue
+    : public SimulatorObject
 {
-class CommandQueue : public SimulatorObject
-{
-	CommandQueue();
-	ostream &dramsim_log;
+    CommandQueue(void);
+
+    std::ostream &dramsim_log;
+
 public:
-	//typedefs
-	typedef vector<BusPacket *> BusPacket1D;
-	typedef vector<BusPacket1D> BusPacket2D;
-	typedef vector<BusPacket2D> BusPacket3D;
+    typedef std::vector<BusPacket *> BusPacket1D;
+    typedef std::vector<BusPacket1D> BusPacket2D;
+    typedef std::vector<BusPacket2D> BusPacket3D;
 
-	//functions
-	CommandQueue(vector< vector<BankState> > &states, ostream &dramsim_log);
-	virtual ~CommandQueue(); 
+    CommandQueue(std::vector<std::vector<BankState> > &states,
+                 std::ostream &dramsim_log);
+    virtual
+        ~CommandQueue(void);
 
-	void enqueue(BusPacket *newBusPacket);
-	bool pop(BusPacket **busPacket);
-	bool hasRoomFor(unsigned numberToEnqueue, unsigned rank, unsigned bank);
-	bool isIssuable(BusPacket *busPacket);
-	bool isEmpty(unsigned rank);
-	void needRefresh(unsigned rank);
-	void print();
-	void update(); //SimulatorObject requirement
-	vector<BusPacket *> &getCommandQueue(unsigned rank, unsigned bank);
+    void
+        enqueue(BusPacket *newBusPacket);
+    bool
+        pop(BusPacket **busPacket);
+    bool
+        hasRoomFor(unsigned numberToEnqueue,
+                   unsigned rank,
+                   unsigned bank);
+    bool
+        isIssuable(BusPacket *busPacket);
+    bool
+        isEmpty(unsigned rank);
+    void
+        needRefresh(unsigned rank);
+    void
+        print(void);
+    void
+        update(void);  ///< SimulatorObject requirement
+    std::vector<BusPacket*> &
+        getCommandQueue(unsigned rank,
+                        unsigned bank);
 
-	//fields
-	
-	BusPacket3D queues; // 3D array of BusPacket pointers
-	vector< vector<BankState> > &bankStates;
+    BusPacket3D queues;  ///< 3D array of BusPacket pointers
+    std::vector<std::vector<BankState>> &bankStates;
+
 private:
-	void nextRankAndBank(unsigned &rank, unsigned &bank);
-	//fields
-	unsigned nextBank;
-	unsigned nextRank;
+    void
+        nextRankAndBank(unsigned &rank,
+                        unsigned &bank);
 
-	unsigned nextBankPRE;
-	unsigned nextRankPRE;
+private:
+    unsigned nextBank;
+    unsigned nextRank;
 
-	unsigned refreshRank;
-	bool refreshWaiting;
+    unsigned nextBankPRE;
+    unsigned nextRankPRE;
 
-	vector< vector<unsigned> > tFAWCountdown;
-	vector< vector<unsigned> > rowAccessCounters;
+    unsigned refreshRank;
+    bool refreshWaiting;
 
-	bool sendAct;
+    std::vector<std::vector<unsigned>> tFAWCountdown;
+    std::vector<std::vector<unsigned>> rowAccessCounters;
+
+    bool sendAct;
 };
-}
+}  // namespace DRAMSim
 
-#endif
+#endif  // CMDQUEUE_HPP
 

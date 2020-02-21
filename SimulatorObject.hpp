@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -28,34 +28,22 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
-
-
-
-
-
-
-
 #ifndef SIMULATOROBJ_HPP
 #define SIMULATOROBJ_HPP
 
-//SimulatorObject.hpp
-//
-//Header file for simulator object class
-//
+#include <cstdint>
 
-#include <stdint.h>
-
-namespace DRAMSim
-{
+namespace DRAMSim {
 class SimulatorObject
 {
 public:
-	uint64_t currentClockCycle;
+    uint64_t currentClockCycle;
 
-	void step();
-	virtual void update()=0;
+    void step(void);
+    virtual void update(void) = 0;
 };
-}
 
-#endif
+}  // namespace DRAMSim
+
+#endif  // SIMULATOROBJ_HPP
 

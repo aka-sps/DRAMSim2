@@ -1,21 +1,21 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
-*                             University of Maryland 
+*                             University of Maryland
 *                             dramninjas [at] gmail [dot] com
 *  All rights reserved.
-*  
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions are met:
-*  
+*
 *     * Redistributions of source code must retain the above copyright notice,
 *        this list of conditions and the following disclaimer.
-*  
+*
 *     * Redistributions in binary form must reproduce the above copyright notice,
 *        this list of conditions and the following disclaimer in the documentation
 *        and/or other materials provided with the distribution.
-*  
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,38 +27,29 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
 #ifndef SYSCONFIG_HPP
 #define SYSCONFIG_HPP
 
-#include <iostream>
+#include "PrintMacros.hpp"
+
 #include <fstream>
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include <stdint.h>
-#include "PrintMacros.hpp"
+#include <cstdint>
 
 #ifdef __APPLE__
 #include <sys/types.h>
 #endif
 
-//SystemConfiguration.hpp
-//
-//Configuration values for the current system
-
-
-
+namespace DRAMSim {
 //number of latencies per bucket in the latency histogram
-//TODO: move to system ini file
-#define HISTOGRAM_BIN_SIZE 10
+// @todo move to system ini file
+static constexpr auto const HISTOGRAM_BIN_SIZE = 10;
 
 extern std::ofstream cmd_verify_out; //used by BusPacket.cpp if VERIFICATION_OUTPUT is enabled
 //extern std::ofstream visDataOut;
 
-//TODO: namespace these to DRAMSim:: 
 extern bool VERIFICATION_OUTPUT; // output suitable to feed to modelsim
 
 extern bool DEBUG_TRANS_Q;
@@ -114,7 +105,7 @@ extern unsigned tXP;
 
 extern unsigned tCMD;
 
-/* For power parameters (current and voltage), see externs in MemoryController.cpp */ 
+/* For power parameters (current and voltage), see externs in MemoryController.cpp */
 
 extern unsigned NUM_DEVICES;
 
@@ -144,79 +135,74 @@ extern std::string QUEUING_STRUCTURE;
 
 enum TraceType
 {
-	k6,
-	mase,
-	misc
+    k6,
+    mase,
+    misc
 };
 
 enum AddressMappingScheme
 {
-	Scheme1,
-	Scheme2,
-	Scheme3,
-	Scheme4,
-	Scheme5,
-	Scheme6,
-	Scheme7
+    Scheme1,
+    Scheme2,
+    Scheme3,
+    Scheme4,
+    Scheme5,
+    Scheme6,
+    Scheme7
 };
 
 // used in MemoryController and CommandQueue
 enum RowBufferPolicy
 {
-	OpenPage,
-	ClosePage
+    OpenPage,
+    ClosePage
 };
 
 // Only used in CommandQueue
 enum QueuingStructure
 {
-	PerRank,
-	PerRankPerBank
+    PerRank,
+    PerRankPerBank
 };
 
 enum SchedulingPolicy
 {
-	RankThenBankRoundRobin,
-	BankThenRankRoundRobin
+    RankThenBankRoundRobin,
+    BankThenRankRoundRobin
 };
 
 
-// set by IniReader.cpp
-
-
-namespace DRAMSim
-{
-typedef void (*returnCallBack_t)(unsigned id, uint64_t addr, uint64_t clockcycle);
-typedef void (*powerCallBack_t)(double bgpower, double burstpower, double refreshpower, double actprepower);
+typedef void(*returnCallBack_t)(unsigned id, uint64_t addr, uint64_t clockcycle);
+typedef void(*powerCallBack_t)(double bgpower, double burstpower, double refreshpower, double actprepower);
 
 extern RowBufferPolicy rowBufferPolicy;
 extern SchedulingPolicy schedulingPolicy;
 extern AddressMappingScheme addressMappingScheme;
 extern QueuingStructure queuingStructure;
-//
-//FUNCTIONS
-//
 
-unsigned inline dramsim_log2(unsigned value)
+static inline unsigned
+dramsim_log2(unsigned value)
 {
-	unsigned logbase2 = 0;
-	unsigned orig = value;
-	value>>=1;
-	while (value>0)
-	{
-		value >>= 1;
-		logbase2++;
-	}
-	if ((unsigned)1<<logbase2<orig)logbase2++;
-	return logbase2;
-}
-inline bool isPowerOfTwo(unsigned long x)
-{
-	return (1UL<<dramsim_log2(x)) == x;
+    unsigned logbase2 = 0;
+    unsigned orig = value;
+    value >>= 1;
+    while (value > 0) {
+        value >>= 1;
+        logbase2++;
+    }
+    if (1u << logbase2 < orig) {
+        ++logbase2;
+    }
+
+    return logbase2;
 }
 
+static inline bool
+isPowerOfTwo(unsigned long x)
+{
+    return (1UL << dramsim_log2(x)) == x;
+}
 
-};
+}  // namespace DRAMSim
 
-#endif
-
+#endif  // SYSCONFIG_HPP

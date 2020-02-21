@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,56 +27,46 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
-
-
-
-
-
 #ifndef BANK_HPP
 #define BANK_HPP
 
-//Bank.hpp
-//
-//Header file for bank class
-//
-
-#include "SystemConfiguration.hpp"
-#include "SimulatorObject.hpp"
 #include "BankState.hpp"
-#include "BusPacket.hpp"
-#include <iostream>
 
-namespace DRAMSim
-{
+#include <iostream>
+#include <vector>
+
+namespace DRAMSim {
+
+class BusPacket;
+
 class Bank
 {
-	typedef struct _DataStruct
-	{
-		unsigned row;
-		void *data;
-		struct _DataStruct *next;
-	} DataStruct;
+    struct DataStruct
+    {
+        unsigned row;
+        void *data;
+        DataStruct *next;
+    };
 
 public:
-	//functions
-	Bank(ostream &dramsim_log_);
-	void read(BusPacket *busPacket);
-	void write(const BusPacket *busPacket);
+    Bank(std::ostream &dramsim_log_);
+    void
+        read(BusPacket *busPacket);
+    void
+        write(const BusPacket *busPacket);
 
-	//fields
-	BankState currentState;
+    BankState currentState;
 
 private:
-	// private member
-	std::vector<DataStruct *> rowEntries;
-	ostream &dramsim_log; 
+    std::vector<DataStruct *> rowEntries;
+    std::ostream &dramsim_log;
 
-	static DataStruct *searchForRow(unsigned row, DataStruct *head);
+    static DataStruct *
+        searchForRow(unsigned row,
+                     DataStruct *head);
 };
-}
 
-#endif
+}  // namespace DRAMSim
+
+#endif  // BANK_HPP
 

@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -31,14 +31,9 @@
 #ifndef INIREADER_HPP
 #define INIREADER_HPP
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <map> 
 #include "SystemConfiguration.hpp"
 
-using namespace std;
+#include <map> 
 
 #define DEFINE_UINT_PARAM(name, paramtype) {#name, &name, UINT, paramtype, false}
 #define DEFINE_STRING_PARAM(name, paramtype) {#name, &name, STRING, paramtype, false}
@@ -46,44 +41,70 @@ using namespace std;
 #define DEFINE_BOOL_PARAM(name, paramtype) {#name, &name, BOOL, paramtype, false}
 #define DEFINE_UINT64_PARAM(name, paramtype) {#name, &name, UINT64, paramtype, false}
 
-namespace DRAMSim
-{
+namespace DRAMSim {
 
-typedef enum _variableType {STRING, UINT, UINT64, FLOAT, BOOL} varType;
-typedef enum _paramType {SYS_PARAM, DEV_PARAM} paramType;
-typedef struct _configMap
+enum varType
 {
-	string iniKey; //for example "tRCD"
+    STRING,
+    UINT,
+    UINT64,
+    FLOAT,
+    BOOL
+};
 
-	void *variablePtr;
-	varType variableType;
-	paramType parameterType;
-	bool wasSet;
-} ConfigMap;
+enum paramType
+{
+    SYS_PARAM,
+    DEV_PARAM
+};
+
+struct ConfigMap
+{
+    std::string iniKey;  ///< for example "tRCD"
+
+    void *variablePtr;
+    varType variableType;
+    paramType parameterType;
+    bool wasSet;
+};
 
 class IniReader
 {
-
 public:
-	typedef std::map<string, string> OverrideMap;
-	typedef OverrideMap::const_iterator OverrideIterator; 
+    typedef std::map<std::string, std::string> OverrideMap;
+    typedef OverrideMap::const_iterator OverrideIterator;
 
-	static void SetKey(string key, string value, bool isSystemParam = false, size_t lineNumber = 0);
-	static void OverrideKeys(const OverrideMap *map);
-	static void ReadIniFile(string filename, bool isSystemParam);
-	static void InitEnumsFromStrings();
-	static bool CheckIfAllSet();
-	static void WriteValuesOut(std::ofstream &visDataOut);
-	static int getBool(const std::string &field, bool *val);
-	static int getUint(const std::string &field, unsigned int *val);
-	static int getUint64(const std::string &field, uint64_t *val);
-	static int getFloat(const std::string &field, float *val);
+    static void SetKey(std::string key,
+                       std::string value,
+                       bool isSystemParam = false,
+                       size_t lineNumber = 0);
+    static void
+        OverrideKeys(const OverrideMap *map);
+    static void
+        ReadIniFile(std::string filename,
+                    bool isSystemParam);
+    static void
+        InitEnumsFromStrings(void);
+    static bool
+        CheckIfAllSet(void);
+    static void
+        WriteValuesOut(std::ofstream &visDataOut);
+    static int
+        getBool(const std::string &field, bool *val);
+    static int
+        getUint(const std::string &field, unsigned int *val);
+    static int
+        getUint64(const std::string &field, uint64_t *val);
+    static int
+        getFloat(const std::string &field, float *val);
 
 private:
-	static void WriteParams(std::ofstream &visDataOut, paramType t);
-	static void Trim(string &str);
+    static void
+        WriteParams(std::ofstream &visDataOut, paramType t);
+    static void
+        Trim(std::string &str);
 };
-}
+}  // namespace DRAMSim
 
 
-#endif
+#endif  // INIREADER_HPP

@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -26,61 +26,73 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
-
-
-
-#include <stdint.h> // uint64_t
-
+*/
 #ifndef CALLBACK_HPP
 #define CALLBACK_HPP
 
-namespace DRAMSim
-{
+#include <cstdint> // uint64_t
+
+namespace DRAMSim {
 
 template <typename ReturnT, typename Param1T, typename Param2T,
-typename Param3T>
-class CallbackBase
+    typename Param3T>
+    class CallbackBase
 {
 public:
-	virtual ~CallbackBase() = 0;
-	virtual ReturnT operator()(Param1T, Param2T, Param3T) = 0;
+    virtual
+        ~CallbackBase() = 0;
+    virtual ReturnT
+        operator()(Param1T, Param2T, Param3T) = 0;
 };
 
-template <typename Return, typename Param1T, typename Param2T, typename Param3T>
-DRAMSim::CallbackBase<Return,Param1T,Param2T,Param3T>::~CallbackBase() {}
+template<
+    typename Return,
+    typename Param1T,
+    typename Param2T,
+    typename Param3T
+>
+DRAMSim::CallbackBase<Return, Param1T, Param2T, Param3T>::~CallbackBase(void)
+{}
 
-template <typename ConsumerT, typename ReturnT,
-typename Param1T, typename Param2T, typename Param3T >
-class Callback: public CallbackBase<ReturnT,Param1T,Param2T,Param3T>
+template<
+    typename ConsumerT,
+    typename ReturnT,
+    typename Param1T,
+    typename Param2T,
+    typename Param3T>
+    class Callback
+    : public CallbackBase<ReturnT, Param1T, Param2T, Param3T>
 {
-private:
-	typedef ReturnT (ConsumerT::*PtrMember)(Param1T,Param2T,Param3T);
+    typedef Callback<ConsumerT, ReturnT, Param1T, Param2T, Param3T> This_class;
+    typedef ReturnT(ConsumerT::*PtrMember)(Param1T, Param2T, Param3T);
 
 public:
-	Callback( ConsumerT* const object, PtrMember member) :
-			object(object), member(member)
-	{
-	}
+    Callback(ConsumerT* const object,
+             PtrMember member)
+        : object(object)
+        , member(member)
+    {}
 
-	Callback( const Callback<ConsumerT,ReturnT,Param1T,Param2T,Param3T>& e ) :
-			object(e.object), member(e.member)
-	{
-	}
+    Callback(const This_class& e)
+        : object(e.object)
+        , member(e.member)
+    {}
 
-	ReturnT operator()(Param1T param1, Param2T param2, Param3T param3)
-	{
-		return (const_cast<ConsumerT*>(object)->*member)
-		       (param1,param2,param3);
-	}
+    ReturnT
+        operator()(Param1T param1,
+                   Param2T param2,
+                   Param3T param3)
+    {
+        return (const_cast<ConsumerT*>(object)->*member)(param1, param2, param3);
+    }
 
 private:
-
-	ConsumerT* const object;
-	const PtrMember  member;
+    ConsumerT* const object;
+    const PtrMember  member;
 };
 
 typedef CallbackBase <void, unsigned, uint64_t, uint64_t> TransactionCompleteCB;
-} // namespace DRAMSim
+
+}  // namespace DRAMSim
 
 #endif

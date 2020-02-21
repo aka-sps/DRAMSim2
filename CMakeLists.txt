@@ -47,6 +47,7 @@ set(HEADER_FILES
 )
 
 add_library(dramsim ${SRC_FILES} ${HEADER_FILES})
+set_target_properties(dramsim PROPERTIES FOLDER "Libs")
 target_include_directories(dramsim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(DRAMSimulator
@@ -67,7 +68,7 @@ add_executable(dramsim_test
 
 target_link_libraries(dramsim_test PRIVATE dramsim)
 
-add_test(NAME run_test
+add_test(NAME test_dramsim
          COMMAND $<TARGET_FILE:dramsim_test>)
 
-set_tests_properties(run_test PROPERTIES DEPENDS dramsim_test)
+set_tests_properties(test_dramsim PROPERTIES DEPENDS dramsim_test)

@@ -1,21 +1,21 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
-*                             University of Maryland 
+*                             University of Maryland
 *                             dramninjas [at] gmail [dot] com
 *  All rights reserved.
-*  
+*
 *  Redistribution and use in source and binary forms, with or without
 *  modification, are permitted provided that the following conditions are met:
-*  
+*
 *     * Redistributions of source code must retain the above copyright notice,
 *        this list of conditions and the following disclaimer.
-*  
+*
 *     * Redistributions in binary form must reproduce the above copyright notice,
 *        this list of conditions and the following disclaimer in the documentation
 *        and/or other materials provided with the distribution.
-*  
+*
 *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 *  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 *  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -27,57 +27,45 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
-
-
-
-
-
 #ifndef BANKSTATE_HPP
 #define BANKSTATE_HPP
 
-//BankState.hpp
-//
-//Header file for bank state class
-//
-
-#include "SystemConfiguration.hpp"
 #include "BusPacket.hpp"
 
-namespace DRAMSim
-{
-enum CurrentBankState
-{
-	Idle,
-	RowActive,
-	Precharging,
-	Refreshing,
-	PowerDown
-};
+namespace DRAMSim {
 
 class BankState
 {
-	ostream &dramsim_log; 
+    std::ostream &dramsim_log;
+
 public:
-	//Fields
-	CurrentBankState currentBankState;
-	unsigned openRowAddress;
-	uint64_t nextRead;
-	uint64_t nextWrite;
-	uint64_t nextActivate;
-	uint64_t nextPrecharge;
-	uint64_t nextPowerUp;
+    enum CurrentBankState
+    {
+        Idle,
+        RowActive,
+        Precharging,
+        Refreshing,
+        PowerDown
+    };
 
-	BusPacketType lastCommand;
-	unsigned stateChangeCountdown;
+    CurrentBankState currentBankState;
+    unsigned openRowAddress;
+    uint64_t nextRead;
+    uint64_t nextWrite;
+    uint64_t nextActivate;
+    uint64_t nextPrecharge;
+    uint64_t nextPowerUp;
 
-	//Functions
-	BankState(ostream &dramsim_log_);
-	void print();
+    BusPacketType lastCommand;
+    unsigned stateChangeCountdown;
+
+    BankState(std::ostream &dramsim_log_);
+
+    void
+        print(void);
 };
-}
 
-#endif
+}  // namespace DRAMSim
+
+#endif  // BANKSTATE_HPP
 

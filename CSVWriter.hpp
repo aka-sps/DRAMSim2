@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,21 +27,17 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-#ifndef _CSV_WRITER_HPP_
-#define _CSV_WRITER_HPP_
+#ifndef CSV_WRITER_HPP_
+#define CSV_WRITER_HPP_
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstring>
 
-#include <string.h>
-
-using std::vector; 
-using std::ostream;
-using std::string; 
-/*
+/** @file
  * CSVWriter: Writes CSV data with headers to an underlying ofstream 
  * 	This wrapper is meant to look like an ofstream, but it captures 
  * 	the names of each field and prints it out to a header before printing
@@ -73,157 +69,165 @@ using std::string;
  *
  */
 
-
 namespace DRAMSim {
 
-	class CSVWriter {
-		public :
-		struct IndexedName {
-			static const size_t MAX_TMP_STR = 64; 
-			static const unsigned SINGLE_INDEX_LEN = 4; 
-			string str; 
+class CSVWriter
+{
+public:
+    struct IndexedName
+    {
+        static const size_t MAX_TMP_STR = 64;
+        static const unsigned SINGLE_INDEX_LEN = 4;
+        std::string str;
 
-			// functions 
-			static bool isNameTooLong(const char *baseName, unsigned numIndices)
-			{
-				return (strlen(baseName)+(numIndices*SINGLE_INDEX_LEN)) > MAX_TMP_STR;
-			}
-			static void checkNameLength(const char *baseName, unsigned numIndices)
-			{
-				if (isNameTooLong(baseName, numIndices))
-				{
-					ERROR("Your string "<<baseName<<" is too long for the max stats size ("<<MAX_TMP_STR<<", increase MAX_TMP_STR"); 
-					exit(-1); 
-				}
-			}
-			IndexedName(const char *baseName, unsigned channel)
-			{
-				checkNameLength(baseName,1);
-				char tmp_str[MAX_TMP_STR]; 
-				snprintf(tmp_str, MAX_TMP_STR,"%s[%u]", baseName, channel); 
-				str = string(tmp_str); 
-			}
-			IndexedName(const char *baseName, unsigned channel, unsigned rank)
-			{
-				checkNameLength(baseName,2);
-				char tmp_str[MAX_TMP_STR]; 
-				snprintf(tmp_str, MAX_TMP_STR,"%s[%u][%u]", baseName, channel, rank); 
-				str = string(tmp_str); 
-			}
-			IndexedName(const char *baseName, unsigned channel, unsigned rank, unsigned bank)
-			{
-				checkNameLength(baseName,3);
-				char tmp_str[MAX_TMP_STR]; 
-				snprintf(tmp_str, MAX_TMP_STR,"%s[%u][%u][%u]", baseName, channel, rank, bank); 
-				str = string(tmp_str);
-			}
+        static bool
+            isNameTooLong(const char *baseName,
+                          unsigned numIndices)
+        {
+            return (strlen(baseName) + (numIndices * SINGLE_INDEX_LEN)) > MAX_TMP_STR;
+        }
 
-		};
-		// where the output will eventually go 
-		ostream &output; 
-		vector<string> fieldNames; 
-		bool finalized; 
-		unsigned idx; 
-		public: 
+        static void
+            checkNameLength(const char *baseName, unsigned numIndices)
+        {
+            if (isNameTooLong(baseName, numIndices)) {
+                ERROR("Your string " << baseName << " is too long for the max stats size (" << MAX_TMP_STR << ", increase MAX_TMP_STR");
+                throw std::logic_error("Your string is too long for the max stats size");
+            }
+        }
 
-		// Functions
-		void finalize()
-		{
-			//TODO: tag unlikely
-			if (!finalized)
-			{
-				for (unsigned i=0; i<fieldNames.size(); i++)
-				{
-					output << fieldNames[i] << ",";
-				}
-				output << std::endl << std::flush;
-				finalized=true; 
-			}
-			else
-			{
-				if (idx < fieldNames.size()) 
-				{
-					printf(" Number of fields doesn't match values (fields=%u, values=%u), check each value has a field name before it\n", idx, (unsigned)fieldNames.size());
-				}
-				idx=0; 
-				output << std::endl; 
-			}
-		}
+        IndexedName(const char *baseName,
+                    unsigned channel)
+        {
+            checkNameLength(baseName, 1);
+            char tmp_str[MAX_TMP_STR];
+            snprintf(tmp_str, MAX_TMP_STR, "%s[%u]", baseName, channel);
+            str = std::string(tmp_str);
+        }
 
-		// Constructor 
-		CSVWriter(ostream &_output) : output(_output), finalized(false), idx(0)
-		{}
+        IndexedName(const char *baseName,
+                    unsigned channel,
+                    unsigned rank)
+        {
+            checkNameLength(baseName, 2);
+            char tmp_str[MAX_TMP_STR];
+            snprintf(tmp_str, MAX_TMP_STR, "%s[%u][%u]", baseName, channel, rank);
+            str = std::string(tmp_str);
+        }
 
-		// Insertion operators for field names
-		CSVWriter &operator<<(const char *name)
-		{
-			if (!finalized)
-			{
-//				cout <<"Adding "<<name<<endl;
-				fieldNames.push_back(string(name));
-			}
-			return *this; 
-		}
+        IndexedName(const char *baseName,
+                    unsigned channel,
+                    unsigned rank,
+                    unsigned bank)
+        {
+            checkNameLength(baseName, 3);
+            char tmp_str[MAX_TMP_STR];
+            snprintf(tmp_str, MAX_TMP_STR, "%s[%u][%u][%u]", baseName, channel, rank, bank);
+            str = std::string(tmp_str);
+        }
 
-		CSVWriter &operator<<(const string &name)
-		{
-			if (!finalized)
-			{
-				fieldNames.push_back(string(name));
-			}
-			return *this; 
-		}
-		
-		CSVWriter &operator<<(const IndexedName &indexedName)
-		{
-			if (!finalized)
-			{
-//				cout <<"Adding "<<indexedName.str<<endl;
-				fieldNames.push_back(indexedName.str);
-			}
-			return *this; 
-		}
-		
-		bool isFinalized()
-		{
-//			printf("obj=%p", this); 
-			return finalized; 
-		}
-		
-		ostream &getOutputStream()
-		{
-			return output; 
-		}
-		// Insertion operators for value types 
-		// All of the other types just need to pass through to the underlying
-		// ofstream, so just write this small wrapper function to make the
-		// whole thing less verbose
-#define ADD_TYPE(T) \
-		CSVWriter &operator<<(T value) \
-		{                                \
-			if (finalized)                \
-			{                             \
-				output << value <<",";     \
-				idx++;                     \
-			}                             \
-			return *this;                 \
-		}                      
+    };
 
-	ADD_TYPE(int);
-	ADD_TYPE(unsigned); 
-	ADD_TYPE(long);
-	ADD_TYPE(uint64_t);
-	ADD_TYPE(float);
-	ADD_TYPE(double);
+    // where the output will eventually go
+    std::ostream &output;
+    std::vector<std::string> fieldNames;
+    bool finalized;
+    unsigned idx;
 
-	//disable copy constructor and assignment operator
-	private:
-		CSVWriter(const CSVWriter &); 
-		CSVWriter &operator=(const CSVWriter &);
-		
-	}; // class CSVWriter
+public:
+    void
+        finalize(void)
+    {
+        /// @todo tag unlikely
 
+        if (!finalized) {
+            for (unsigned i = 0; i < fieldNames.size(); i++) {
+                output << fieldNames[i] << ",";
+            }
 
+            output << std::endl << std::flush;
+            finalized = true;
+        } else {
+            if (idx < fieldNames.size()) {
+                printf(" Number of fields doesn't match values (fields=%u, values=%u), check each value has a field name before it\n", idx, (unsigned)fieldNames.size());
+            }
+
+            idx = 0;
+            output << std::endl;
+        }
+    }
+
+    CSVWriter(std::ostream & _output)
+        : output(_output)
+        , finalized(false)
+        , idx(0)
+    {}
+
+    // Insertion operators for field names
+    CSVWriter &
+        operator<<(const char *name)
+    {
+        if (!finalized) {
+            fieldNames.push_back(std::string(name));
+        }
+
+        return *this;
+    }
+
+    CSVWriter &
+        operator<<(const std::string &name)
+    {
+        if (!finalized) {
+            fieldNames.push_back(std::string(name));
+        }
+
+        return *this;
+    }
+
+    CSVWriter &
+        operator<<(const IndexedName &indexedName)
+    {
+        if (!finalized) {
+            fieldNames.push_back(indexedName.str);
+        }
+
+        return *this;
+    }
+
+    bool
+        isFinalized(void)const
+    {
+        return finalized;
+    }
+
+    std::ostream &
+        getOutputStream(void)const
+    {
+        return output;
+    }
+
+    /// Insertion operators for value types
+    /// All of the other types just need to pass through to the underlying
+    /// ofstream, so just write this small wrapper function to make the
+    /// whole thing less verbose
+    template <typename T>
+    CSVWriter &
+        operator<<(T const& value)
+    {
+        if (finalized) {
+            output << value << ",";
+            ++idx;
+        }
+
+        return *this;
+    }
+
+private:
+    /// disable copy constructor and assignment operator
+    CSVWriter(const CSVWriter &) = delete;
+    CSVWriter &operator=(const CSVWriter &) = delete;
+
+};
 } // namespace DRAMSim
 
-#endif // _CSV_WRITER_H_
+#endif  // CSV_WRITER_HPP_

@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,63 +27,97 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
+
+#include "Callback.hpp"
 #include "SimulatorObject.hpp"
-#include "Transaction.hpp"
-#include "SystemConfiguration.hpp"
-#include "MemorySystem.hpp"
 #include "IniReader.hpp"
 #include "ClockDomain.hpp"
-#include "CSVWriter.hpp"
-
 
 namespace DRAMSim {
 
+class Transaction;
+class MemorySystem;
+class CSVWriter;
 
-class MultiChannelMemorySystem : public SimulatorObject 
+class MultiChannelMemorySystem
+    : public SimulatorObject 
 {
-	public: 
+public:
+    MultiChannelMemorySystem(const std::string &dev,
+                             const std::string &sys,
+                             const std::string &pwd,
+                             const std::string &trc,
+                             unsigned megsOfMemory,
+                             std::string *visFilename = nullptr,
+                             const IniReader::OverrideMap *paramOverrides = nullptr);
+    virtual
+        ~MultiChannelMemorySystem(void);
 
-	MultiChannelMemorySystem(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, string *visFilename=NULL, const IniReader::OverrideMap *paramOverrides=NULL);
-		virtual ~MultiChannelMemorySystem();
-			bool addTransaction(Transaction *trans);
-			bool addTransaction(const Transaction &trans);
-			bool addTransaction(bool isWrite, uint64_t addr);
-			bool willAcceptTransaction(); 
-			bool willAcceptTransaction(uint64_t addr); 
-			void update();
-			void printStats(bool finalStats=false);
-			ostream &getLogFile();
-			void RegisterCallbacks( 
-				TransactionCompleteCB *readDone,
-				TransactionCompleteCB *writeDone,
-				void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
-			int getIniBool(const std::string &field, bool *val);
-			int getIniUint(const std::string &field, unsigned int *val);
-			int getIniUint64(const std::string &field, uint64_t *val);
-			int getIniFloat(const std::string &field, float *val);
+    bool
+        addTransaction(Transaction *trans);
+    bool
+        addTransaction(const Transaction &trans);
+    bool
+        addTransaction(bool isWrite,
+                       uint64_t addr);
+    bool
+        willAcceptTransaction(void);
+    bool
+        willAcceptTransaction(uint64_t addr);
+    void
+        update();
+    void
+        printStats(bool finalStats = false);
 
-	void InitOutputFiles(string tracefilename);
-	void setCPUClockSpeed(uint64_t cpuClkFreqHz);
+    std::ostream &
+        getLogFile(void)
+    {
+        return dramsim_log;
+    }
 
-	//output file
-	std::ofstream visDataOut;
-	ofstream dramsim_log; 
+    void RegisterCallbacks(
+            TransactionCompleteCB *readDone,
+            TransactionCompleteCB *writeDone,
+            void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
+    int
+        getIniBool(const std::string &field,
+                   bool *val);
+    int
+        getIniUint(const std::string &field,
+                   unsigned int *val);
+    int
+        getIniUint64(const std::string &field,
+                     uint64_t *val);
+    int
+        getIniFloat(const std::string &field, float *val);
 
-	private:
-		unsigned findChannelNumber(uint64_t addr);
-		void actual_update(); 
-		vector<MemorySystem*> channels; 
-		unsigned megsOfMemory; 
-		string deviceIniFilename;
-		string systemIniFilename;
-		string traceFilename;
-		string pwd;
-		string *visFilename;
-		ClockDomain::ClockDomainCrosser clockDomainCrosser; 
-		static void mkdirIfNotExist(string path);
-		static bool fileExists(string path); 
-		CSVWriter *csvOut; 
+    void
+        InitOutputFiles(std::string tracefilename);
+    void
+        setCPUClockSpeed(uint64_t cpuClkFreqHz);
 
+    //output file
+    std::ofstream visDataOut;
+    std::ofstream dramsim_log;
 
-	};
-}
+private:
+    unsigned
+        findChannelNumber(uint64_t addr);
+    void
+        actual_update(void);
+
+    std::vector<MemorySystem*> channels;
+    unsigned megsOfMemory;
+    std::string deviceIniFilename;
+    std::string systemIniFilename;
+    std::string traceFilename;
+    std::string pwd;
+    std::string *visFilename;
+    ClockDomain::ClockDomainCrosser clockDomainCrosser;
+    static void
+        mkdirIfNotExist(std::string path);
+    static bool
+        fileExists(std::string path);
+    CSVWriter *csvOut;
+};
+}  // namespace DRAMSim

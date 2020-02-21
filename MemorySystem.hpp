@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,63 +27,58 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
+//Header file for JEDEC memory system wrapper
 #ifndef MEMORYSYSTEM_HPP
 #define MEMORYSYSTEM_HPP
 
-//MemorySystem.hpp
-//
-//Header file for JEDEC memory system wrapper
-//
-
-#include "SimulatorObject.hpp"
 #include "SystemConfiguration.hpp"
 #include "MemoryController.hpp"
 #include "Rank.hpp"
-#include "Transaction.hpp"
 #include "Callback.hpp"
 #include "CSVWriter.hpp"
 #include <deque>
 
-namespace DRAMSim
+namespace DRAMSim {
+typedef CallbackBase<void, unsigned, uint64_t, uint64_t> Callback_t;
+
+class MemorySystem
+    : public SimulatorObject
 {
-typedef CallbackBase<void,unsigned,uint64_t,uint64_t> Callback_t;
-class MemorySystem : public SimulatorObject
-{
-	ostream &dramsim_log;
+    std::ostream &dramsim_log;
+
 public:
-	//functions
-	MemorySystem(unsigned id, unsigned megsOfMemory, CSVWriter &csvOut_, ostream &dramsim_log_);
-	virtual ~MemorySystem();
-	void update();
-	bool addTransaction(Transaction *trans);
-	bool addTransaction(bool isWrite, uint64_t addr);
-	void printStats(bool finalStats);
-	bool WillAcceptTransaction();
-	void RegisterCallbacks(
-	    Callback_t *readDone,
-	    Callback_t *writeDone,
-	    void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
+    MemorySystem(unsigned id,
+                 unsigned megsOfMemory,
+                 CSVWriter &csvOut_,
+                 std::ostream &dramsim_log_);
+    virtual
+        ~MemorySystem();
+    void
+        update();
+    bool
+        addTransaction(Transaction *trans);
+    bool
+        addTransaction(bool isWrite, uint64_t addr);
+    void
+        printStats(bool finalStats);
+    bool
+        WillAcceptTransaction(void);
+    void RegisterCallbacks(Callback_t *readDone,
+                           Callback_t *writeDone,
+                           void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
 
-	//fields
-	MemoryController *memoryController;
-	vector<Rank *> *ranks;
-	deque<Transaction *> pendingTransactions; 
-
-
-	//function pointers
-	Callback_t* ReturnReadData;
-	Callback_t* WriteDataDone;
-	//TODO: make this a functor as well?
-	static powerCallBack_t ReportPower;
-	unsigned systemID;
+    MemoryController *memoryController;
+    std::vector<Rank *> *ranks;
+    std::deque<Transaction *> pendingTransactions;
+    Callback_t* ReturnReadData;
+    Callback_t* WriteDataDone;
+    /// @todo make this a functor as well?
+    static powerCallBack_t ReportPower;
+    unsigned systemID;
 
 private:
-	CSVWriter &csvOut;
+    CSVWriter &csvOut;
 };
-}
+}  // namespace DRAMSim
 
-#endif
-
+#endif  // MEMORYSYSTEM_HPP

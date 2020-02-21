@@ -1,4 +1,4 @@
-/*********************************************************************************
+/** @file
 *  Copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
@@ -26,42 +26,63 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
-
-
+*
+* This is a public header for DRAMSim including this along with libdramsim.so should
+* provide all necessary functionality to talk to an external simulator
+*/
 #ifndef DRAMSIM_HPP
 #define DRAMSIM_HPP
-/*
- * This is a public header for DRAMSim including this along with libdramsim.so should
- * provide all necessary functionality to talk to an external simulator
- */
+
 #include "Callback.hpp"
+
 #include <string>
-using std::string;
 
-namespace DRAMSim 
+namespace DRAMSim {
+
+class MultiChannelMemorySystem
 {
+public:
+    bool
+        addTransaction(bool isWrite,
+                       uint64_t addr);
+    void
+        setCPUClockSpeed(uint64_t cpuClkFreqHz);
+    void
+        update(void);
+    void
+        printStats(bool finalStats);
+    bool
+        willAcceptTransaction(void);
+    bool
+        willAcceptTransaction(uint64_t addr);
+    std::ostream &
+        getLogFile(void);
 
-	class MultiChannelMemorySystem {
-		public: 
-			bool addTransaction(bool isWrite, uint64_t addr);
-			void setCPUClockSpeed(uint64_t cpuClkFreqHz);
-			void update();
-			void printStats(bool finalStats);
-			bool willAcceptTransaction(); 
-			bool willAcceptTransaction(uint64_t addr); 
-			std::ostream &getLogFile();
+    void
+        RegisterCallbacks(TransactionCompleteCB *readDone,
+                          TransactionCompleteCB *writeDone,
+                          void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
+    int
+        getIniBool(const std::string &field,
+                   bool *val);
+    int
+        getIniUint(const std::string &field,
+                   unsigned int *val);
+    int
+        getIniUint64(const std::string &field,
+                     uint64_t *val);
+    int
+        getIniFloat(const std::string &field,
+                    float *val);
+};
 
-			void RegisterCallbacks( 
-				TransactionCompleteCB *readDone,
-				TransactionCompleteCB *writeDone,
-				void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
-			int getIniBool(const std::string &field, bool *val);
-			int getIniUint(const std::string &field, unsigned int *val);
-			int getIniUint64(const std::string &field, uint64_t *val);
-			int getIniFloat(const std::string &field, float *val);
-	};
-	MultiChannelMemorySystem *getMemorySystemInstance(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, std::string *visfilename=NULL);
-}
+MultiChannelMemorySystem *
+getMemorySystemInstance(const std::string &dev,
+                        const std::string &sys,
+                        const std::string &pwd,
+                        const std::string &trc,
+                        unsigned megsOfMemory,
+                        std::string *visfilename = nullptr);
+}  // namespace DRAMSim
 
-#endif
+#endif  // DRAMSIM_HPP

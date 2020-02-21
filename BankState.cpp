@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,62 +27,48 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
-
-
-
-
-
-//BankState.cpp
-//
 //Class file for bank state object
-//
 
 #include "BankState.hpp"
 
+#include "PrintMacros.hpp"
+
+namespace DRAMSim {
 using namespace std;
-using namespace DRAMSim;
 
 //All banks start precharged
-BankState::BankState(ostream &dramsim_log_):
-		dramsim_log(dramsim_log_),
-		currentBankState(Idle),
-		openRowAddress(0),
-		nextRead(0),
-		nextWrite(0),
-		nextActivate(0),
-		nextPrecharge(0),
-		nextPowerUp(0),
-		lastCommand(READ),
-		stateChangeCountdown(0)
+BankState::BankState(ostream &dramsim_log_) :
+    dramsim_log(dramsim_log_),
+    currentBankState(Idle),
+    openRowAddress(0),
+    nextRead(0),
+    nextWrite(0),
+    nextActivate(0),
+    nextPrecharge(0),
+    nextPowerUp(0),
+    lastCommand(READ),
+    stateChangeCountdown(0)
 {}
 
 void BankState::print()
 {
-	PRINT(" == Bank State ");
-	if (currentBankState == Idle)
-	{
-		PRINT("    State : Idle" );
-	}
-	else if (currentBankState == RowActive)
-	{
-		PRINT("    State : Active" );
-	}
-	else if (currentBankState == Refreshing)
-	{
-		PRINT("    State : Refreshing" );
-	}
-	else if (currentBankState == PowerDown)
-	{
-		PRINT("    State : Power Down" );
-	}
+    PRINT(" == Bank State ");
+    if (currentBankState == Idle) {
+        PRINT("    State : Idle");
+    } else if (currentBankState == RowActive) {
+        PRINT("    State : Active");
+    } else if (currentBankState == Refreshing) {
+        PRINT("    State : Refreshing");
+    } else if (currentBankState == PowerDown) {
+        PRINT("    State : Power Down");
+    }
 
-	PRINT("    OpenRowAddress : " << openRowAddress );
-	PRINT("    nextRead       : " << nextRead );
-	PRINT("    nextWrite      : " << nextWrite );
-	PRINT("    nextActivate   : " << nextActivate );
-	PRINT("    nextPrecharge  : " << nextPrecharge );
-	PRINT("    nextPowerUp    : " << nextPowerUp );
+    PRINT("    OpenRowAddress : " << openRowAddress);
+    PRINT("    nextRead       : " << nextRead);
+    PRINT("    nextWrite      : " << nextWrite);
+    PRINT("    nextActivate   : " << nextActivate);
+    PRINT("    nextPrecharge  : " << nextPrecharge);
+    PRINT("    nextPowerUp    : " << nextPowerUp);
 }
+
+}  // namespace DRAMSim

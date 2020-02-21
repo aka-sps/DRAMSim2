@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,111 +27,101 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
 #ifndef MEMORYCONTROLLER_HPP
 #define MEMORYCONTROLLER_HPP
 
-//MemoryController.hpp
-//
-//Header file for memory controller object
-//
-
-#include "SimulatorObject.hpp"
-#include "Transaction.hpp"
-#include "SystemConfiguration.hpp"
 #include "CommandQueue.hpp"
-#include "BusPacket.hpp"
-#include "BankState.hpp"
-#include "Rank.hpp"
-#include "CSVWriter.hpp"
+
 #include <map>
 
-using namespace std;
+namespace DRAMSim {
 
-namespace DRAMSim
-{
 class MemorySystem;
-class MemoryController : public SimulatorObject
+class Rank;
+class CSVWriter;
+class Transaction;
+class BusPacket;
+
+class MemoryController
+    : public SimulatorObject
 {
-
 public:
-	//functions
-	MemoryController(MemorySystem* ms, CSVWriter &csvOut_, ostream &dramsim_log_);
-	virtual ~MemoryController();
+    MemoryController(MemorySystem* ms,
+                     CSVWriter &csvOut_,
+                     std::ostream &dramsim_log_);
+    virtual
+        ~MemoryController();
 
-	bool addTransaction(Transaction *trans);
-	bool WillAcceptTransaction();
-	void returnReadData(const Transaction *trans);
-	void receiveFromBus(BusPacket *bpacket);
-	void attachRanks(vector<Rank *> *ranks);
-	void update();
-	void printStats(bool finalStats = false);
-	void resetStats(); 
+    bool
+        addTransaction(Transaction *trans);
+    bool
+        WillAcceptTransaction(void);
+    void
+        returnReadData(const Transaction *trans);
+    void
+        receiveFromBus(BusPacket *bpacket);
+    void
+        attachRanks(std::vector<Rank*> *ranks);
+    void
+        update(void);
+    void
+        printStats(bool finalStats = false);
+    void
+        resetStats(void);
 
+    std::vector<Transaction *> transactionQueue;
 
-	//fields
-	vector<Transaction *> transactionQueue;
 private:
-	ostream &dramsim_log;
-	vector< vector <BankState> > bankStates;
-	//functions
-	void insertHistogram(unsigned latencyValue, unsigned rank, unsigned bank);
+    std::ostream &dramsim_log;
+    std::vector<std::vector<BankState> > bankStates;
+    void
+        insertHistogram(unsigned latencyValue,
+                        unsigned rank,
+                        unsigned bank);
 
-	//fields
-	MemorySystem *parentMemorySystem;
+    MemorySystem *parentMemorySystem;
+    CommandQueue commandQueue;
+    BusPacket *poppedBusPacket;
+    std::vector<unsigned>refreshCountdown;
+    std::vector<BusPacket *> writeDataToSend;
+    std::vector<unsigned> writeDataCountdown;
+    std::vector<Transaction *> returnTransaction;
+    std::vector<Transaction *> pendingReadTransactions;
+    std::map<unsigned, unsigned> latencies;  ///< latencyValue -> latencyCount
+    std::vector<bool> powerDown;
+    std::vector<Rank *> *ranks;
 
-	CommandQueue commandQueue;
-	BusPacket *poppedBusPacket;
-	vector<unsigned>refreshCountdown;
-	vector<BusPacket *> writeDataToSend;
-	vector<unsigned> writeDataCountdown;
-	vector<Transaction *> returnTransaction;
-	vector<Transaction *> pendingReadTransactions;
-	map<unsigned,unsigned> latencies; // latencyValue -> latencyCount
-	vector<bool> powerDown;
+    CSVWriter &csvOut;
 
-	vector<Rank *> *ranks;
+    // these packets are counting down waiting to be transmitted on the "bus"
+    BusPacket *outgoingCmdPacket;
+    unsigned cmdCyclesLeft;
+    BusPacket *outgoingDataPacket;
+    unsigned dataCyclesLeft;
 
-	//output file
-	CSVWriter &csvOut; 
+    uint64_t totalTransactions;
+    std::vector<uint64_t> grandTotalBankAccesses;
+    std::vector<uint64_t> totalReadsPerBank;
+    std::vector<uint64_t> totalWritesPerBank;
+    std::vector<uint64_t> totalReadsPerRank;
+    std::vector<uint64_t> totalWritesPerRank;
+    std::vector< uint64_t > totalEpochLatency;
 
-	// these packets are counting down waiting to be transmitted on the "bus"
-	BusPacket *outgoingCmdPacket;
-	unsigned cmdCyclesLeft;
-	BusPacket *outgoingDataPacket;
-	unsigned dataCyclesLeft;
+    unsigned channelBitWidth;
+    unsigned rankBitWidth;
+    unsigned bankBitWidth;
+    unsigned rowBitWidth;
+    unsigned colBitWidth;
+    unsigned byteOffsetWidth;
+    unsigned refreshRank;
 
-	uint64_t totalTransactions;
-	vector<uint64_t> grandTotalBankAccesses; 
-	vector<uint64_t> totalReadsPerBank;
-	vector<uint64_t> totalWritesPerBank;
-
-	vector<uint64_t> totalReadsPerRank;
-	vector<uint64_t> totalWritesPerRank;
-
-
-	vector< uint64_t > totalEpochLatency;
-
-	unsigned channelBitWidth;
-	unsigned rankBitWidth;
-	unsigned bankBitWidth;
-	unsigned rowBitWidth;
-	unsigned colBitWidth;
-	unsigned byteOffsetWidth;
-
-
-	unsigned refreshRank;
-	
 public:
-	// energy values are per rank -- SST uses these directly, so make these public 
-	vector< uint64_t > backgroundEnergy;
-	vector< uint64_t > burstEnergy;
-	vector< uint64_t > actpreEnergy;
-	vector< uint64_t > refreshEnergy;
-
+    // energy values are per rank -- SST uses these directly, so make these public 
+    std::vector<uint64_t> backgroundEnergy;
+    std::vector<uint64_t> burstEnergy;
+    std::vector<uint64_t> actpreEnergy;
+    std::vector<uint64_t> refreshEnergy;
 };
-}
+}  // namespace DRAMSim
 
-#endif
-
+#endif  // MEMORYCONTROLLER_HPP

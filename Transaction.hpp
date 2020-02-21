@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -31,83 +31,41 @@
 #ifndef TRANSACTION_HPP
 #define TRANSACTION_HPP
 
-//Transaction.hpp
-//
-//Header file for transaction object
-
-#include "SystemConfiguration.hpp"
 #include "BusPacket.hpp"
+//#include "SystemConfiguration.hpp"
 
-using std::ostream; 
+#include <cstdint>
 
-namespace DRAMSim
-{
+namespace DRAMSim {
+
 enum TransactionType
 {
-	DATA_READ,
-	DATA_WRITE,
-	RETURN_DATA
+    DATA_READ,
+    DATA_WRITE,
+    RETURN_DATA
 };
 
 class Transaction
 {
-	Transaction();
+    Transaction(void);
+
 public:
-	//fields
-	TransactionType transactionType;
-	uint64_t address;
-	void *data;
-	uint64_t timeAdded;
-	uint64_t timeReturned;
+    TransactionType transactionType;
+    uint64_t address;
+    void *data;
+    uint64_t timeAdded;
+    uint64_t timeReturned;
 
+    friend std::ostream &operator<<(std::ostream &os, const Transaction &t);
 
-	friend ostream &operator<<(ostream &os, const Transaction &t);
-	//functions
-	Transaction(TransactionType transType, uint64_t addr, void *data);
-	Transaction(const Transaction &t);
+    Transaction(TransactionType transType, uint64_t addr, void *data);
+    Transaction(const Transaction &t);
 
-	BusPacketType getBusPacketType()
-	{
-		switch (transactionType)
-		{
-			case DATA_READ:
-			if (rowBufferPolicy == ClosePage)
-			{
-				return READ_P;
-			}
-			else if (rowBufferPolicy == OpenPage)
-			{
-				return READ; 
-			}
-			else
-			{
-				ERROR("Unknown row buffer policy");
-				abort();
-			}
-			break;
-		case DATA_WRITE:
-			if (rowBufferPolicy == ClosePage)
-			{
-				return WRITE_P;
-			}
-			else if (rowBufferPolicy == OpenPage)
-			{
-				return WRITE; 
-			}
-			else
-			{
-				ERROR("Unknown row buffer policy");
-				abort();
-			}
-			break;
-		default:
-			ERROR("This transaction type doesn't have a corresponding bus packet type");
-			abort();
-		}
-	}
+    BusPacketType
+        getBusPacketType(void)const;
 };
 
-}
+}  // namespace DRAMSim
 
 #endif
 

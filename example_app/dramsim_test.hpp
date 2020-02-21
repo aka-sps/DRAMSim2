@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,18 +27,23 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
+#ifndef DRAMSIM_TEST_HPP_
+#define DRAMSIM_TEST_HPP_
 
-
-
+#include <DRAMSim.hpp>
 
 #include <string>
-#include <stdint.h>
-#include <DRAMSim.hpp>
+#include <cstdint>
 
 class some_object
 {
-	public: 
-		void read_complete(unsigned, uint64_t, uint64_t);
-		void write_complete(unsigned, uint64_t, uint64_t);
-		int add_one_and_run(DRAMSim::MultiChannelMemorySystem *mem, uint64_t addr);
+public:
+    void
+        read_complete(unsigned, uint64_t, uint64_t);
+    void
+        write_complete(unsigned, uint64_t, uint64_t);
+    int
+        add_one_and_run(DRAMSim::MultiChannelMemorySystem *mem, uint64_t addr);
 };
+
+#endif  // DRAMSIM_TEST_HPP_

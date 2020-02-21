@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -28,44 +28,40 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
-
-
-
-
 #ifndef PRINT_MACROS_HPP
 #define PRINT_MACROS_HPP
 
 #include <iostream>
 
+namespace DRAMSim {
 extern int SHOW_SIM_OUTPUT;
+}  // namespace DRAMSim
 
-#define ERROR(str) std::cerr<<"[ERROR ("<<__FILE__<<":"<<__LINE__<<")]: "<<str<<std::endl;
-
-using std::ostream;
+#define ERROR(STR) do {std::cerr << "[ERROR (" << __FILE__ << ":" << __LINE__ << ")]: " << STR << std::endl; } while (0)
 
 #ifdef DEBUG_BUILD
-	#define DEBUG(str)  std::cerr<< str <<std::endl;
-	#define DEBUGN(str) std::cerr<< str;
-#else
-	#define DEBUG(str) ;
-	#define DEBUGN(str) ;
-#endif
+#define DEBUG(str)  do {std::cerr<< str <<std::endl; } while (0)
+#define DEBUGN(str) do {std::cerr<< str;} while (0)
+#else  // DEBUG_BUILD
+#define DEBUG(str) do {} while (0)
+#define DEBUGN(str) do {} while (0)
+#endif  // DEBUG_BUILD
 
 #ifdef NO_OUTPUT
-	#undef DEBUG
-	#undef DEBUGN
-	#define DEBUG(str) ;
-	#define DEBUGN(str) ;
-	#define PRINT(str) ;
-	#define PRINTN(str) ;
-#else
-	#ifdef LOG_OUTPUT
-		#define PRINT(str)  { dramsim_log <<str<<std::endl; }
-		#define PRINTN(str) { dramsim_log <<str; }
-	#else
-		#define PRINT(str)  if(SHOW_SIM_OUTPUT) { std::cout <<str<<std::endl; }
-		#define PRINTN(str) if(SHOW_SIM_OUTPUT) { std::cout <<str; }
-	#endif
-#endif
+#undef DEBUG
+#undef DEBUGN
+#define DEBUG(str) do {} while (0)
+#define DEBUGN(str) do {} while (0)
+#define PRINT(str) do {} while (0)
+#define PRINTN(str) do {} while (0)
+#else  // NO_OUTPUT
+#ifdef LOG_OUTPUT
+#define PRINT(str)  do { dramsim_log <<str<<std::endl; } while (0)
+#define PRINTN(str) do { dramsim_log <<str; } while (0)
+#else  // LOG_OUTPUT
+#define PRINT(str)  do {if(SHOW_SIM_OUTPUT) { std::cout <<str<<std::endl; }} while (0)
+#define PRINTN(str) do {if(SHOW_SIM_OUTPUT) { std::cout <<str; }} while (0)
+#endif  // LOG_OUTPUT
+#endif  // NO_OUTPUT
 
-#endif /*PRINT_MACROS_H*/
+#endif  // PRINT_MACROS_HPP

@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -27,60 +27,67 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
-
-
-
-
 #ifndef RANK_HPP
 #define RANK_HPP
 
-#include "SimulatorObject.hpp"
-#include "BusPacket.hpp"
-#include "SystemConfiguration.hpp"
 #include "Bank.hpp"
-#include "BankState.hpp"
+#include "SimulatorObject.hpp"
 
-using namespace std;
-using namespace DRAMSim;
+namespace DRAMSim {
+class MemoryController;
 
-namespace DRAMSim
-{
-class MemoryController; //forward declaration
-class Rank : public SimulatorObject
+class Rank
+    : public SimulatorObject
 {
 private:
-	int id;
-	ostream &dramsim_log; 
-	unsigned incomingWriteBank;
-	unsigned incomingWriteRow;
-	unsigned incomingWriteColumn;
-	bool isPowerDown;
+    int id;
+    std::ostream &dramsim_log;
+    unsigned incomingWriteBank;
+    unsigned incomingWriteRow;
+    unsigned incomingWriteColumn;
+    bool isPowerDown;
 
 public:
-	//functions
-	Rank(ostream &dramsim_log_);
-	virtual ~Rank(); 
-	void receiveFromBus(BusPacket *packet);
-	void attachMemoryController(MemoryController *mc);
-	int getId() const;
-	void setId(int id);
-	void update();
-	void powerUp();
-	void powerDown();
+    Rank(std::ostream &dramsim_log_);
+    virtual
+        ~Rank();
+    void
+        receiveFromBus(BusPacket *packet);
+    void
+        attachMemoryController(MemoryController *mc);
+    int
+        getId(void) const
+    {
+        return this->id;
+    }
 
-	//fields
-	MemoryController *memoryController;
-	BusPacket *outgoingDataPacket;
-	unsigned dataCyclesLeft;
-	bool refreshWaiting;
+    /// mutators
+    void
+        setId(int id)
+    {
+        this->id = id;
+    }
+    void
+        update(void);
+    void
+        powerUp(void);
+    void
+        powerDown(void);
 
-	//these are vectors so that each element is per-bank
-	vector<BusPacket *> readReturnPacket;
-	vector<unsigned> readReturnCountdown;
-	vector<Bank> banks;
-	vector<BankState> bankStates;
+    MemoryController *memoryController;
+    BusPacket *outgoingDataPacket;
+    unsigned dataCyclesLeft;
+    bool refreshWaiting;
+
+    // these are vectors so that each element is per-bank
+    std::vector<BusPacket *> readReturnPacket;
+    std::vector<unsigned> readReturnCountdown;
+    std::vector<Bank> banks;
+    std::vector<BankState> bankStates;
 
 };
-}
-#endif
+}  // namespace DRAMSim
+
+#endif  // RANK_HPP
+
 
