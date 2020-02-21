@@ -60,8 +60,8 @@ MultiChannelMemorySystem::MultiChannelMemorySystem(const string &deviceIniFilena
 {
     currentClockCycle = 0;
 
-    if (visFilename) {
-        printf("CC VISFILENAME=%s\n", visFilename->c_str());
+    if (this->visFilename) {
+        printf("CC VISFILENAME=%s\n", this->visFilename->c_str());
     }
 
     if (!isPowerOfTwo(megsOfMemory)) {
@@ -70,23 +70,24 @@ MultiChannelMemorySystem::MultiChannelMemorySystem(const string &deviceIniFilena
 
     if (pwd.length() > 0) {
         //ignore the pwd argument if the argument is an absolute path
-        if (deviceIniFilename[0] != '/') {
-            deviceIniFilename = pwd + "/" + deviceIniFilename;
+        if (this->deviceIniFilename[0] != '/') {
+            this->deviceIniFilename = pwd + "/" + deviceIniFilename;
         }
 
-        if (systemIniFilename[0] != '/') {
-            systemIniFilename = pwd + "/" + systemIniFilename;
+        if (this->systemIniFilename[0] != '/') {
+            this->systemIniFilename = pwd + "/" + this->systemIniFilename;
         }
     }
 
-    DEBUG("== Loading device model file '" << deviceIniFilename << "' == ");
-    IniReader::ReadIniFile(deviceIniFilename, false);
-    DEBUG("== Loading system model file '" << systemIniFilename << "' == ");
-    IniReader::ReadIniFile(systemIniFilename, true);
+    DEBUG("== Loading device model file '" << this->deviceIniFilename << "' == ");
+    IniReader::ReadIniFile(this->deviceIniFilename, false);
+    DEBUG("== Loading system model file '" << this->systemIniFilename << "' == ");
+    IniReader::ReadIniFile(this->systemIniFilename, true);
 
     // If we have any overrides, set them now before creating all of the memory objects
-    if (paramOverrides)
+    if (paramOverrides) {
         IniReader::OverrideKeys(paramOverrides);
+    }
 
     IniReader::InitEnumsFromStrings();
 
@@ -98,9 +99,8 @@ MultiChannelMemorySystem::MultiChannelMemorySystem(const string &deviceIniFilena
         throw std::logic_error("Zero channels");
     }
 
-    for (size_t i = 0; i < NUM_CHANS; i++) {
-        MemorySystem *channel = new MemorySystem(i, megsOfMemory / NUM_CHANS, (*csvOut), dramsim_log);
-        channels.push_back(channel);
+    for (size_t i = 0; i < NUM_CHANS; ++i) {
+        channels.push_back(new MemorySystem(i, megsOfMemory / NUM_CHANS, *csvOut, dramsim_log));
     }
 }
 
@@ -108,7 +108,7 @@ MultiChannelMemorySystem::MultiChannelMemorySystem(const string &deviceIniFilena
     If cpuClkFreqHz == 0, then assume a 1:1 ratio (like for TraceBasedSim)
 */
 void
-MultiChannelMemorySystem::setCPUClockSpeed(uint64_t cpuClkFreqHz)
+MultiChannelMemorySystem::setCPUClockSpeed(uint64_t const cpuClkFreqHz)
 {
     uint64_t const dramsimClkFreqHz = static_cast<uint64_t>(1.0 / (tCK * 1e-9));
     clockDomainCrosser.clock1 = dramsimClkFreqHz;
@@ -134,7 +134,7 @@ fileExists(string const &path)
 static string
 FilenameWithNumberSuffix(const string &filename,
                          const string &extension,
-                         unsigned maxNumber = 100)
+                         unsigned const maxNumber = 100)
 {
     string currentFilename = filename + extension;
 
@@ -162,6 +162,7 @@ FilenameWithNumberSuffix(const string &filename,
     ERROR("Warning: Couldn't find a suitable suffix for " << filename);
     return currentFilename;
 }
+
 /**
  * This function creates up to 3 output files:
  * 	- The .log file if LOG_OUTPUT is set
@@ -170,29 +171,23 @@ FilenameWithNumberSuffix(const string &filename,
  * The results directory is setup to be in PWD/TRACEFILENAME.[SIM_DESC]/DRAM_PARTNAME/PARAMS.vis
  * The environment variable SIM_DESC is also appended to output files/directories
  *
- * @todo verification info needs to be generated per channel so it has to be
- * moved back to MemorySystem
- **/
+ * @todo verification info needs to be generated per channel so it has to be moved back to MemorySystem
+ */
 void
 MultiChannelMemorySystem::InitOutputFiles(string traceFilename)
 {
-    size_t lastSlash;
-    size_t deviceIniFilenameLength = deviceIniFilename.length();
-    string sim_description_str;
+    auto deviceIniFilenameLength = deviceIniFilename.length();
+
+    char *const sim_description = getenv("SIM_DESC");
+    auto const sim_description_str = sim_description ? string(sim_description) : string();
     string deviceName;
-
-    char *sim_description = getenv("SIM_DESC");
-    if (sim_description) {
-        sim_description_str = string(sim_description);
-    }
-
 
     // create a properly named verification output file if need be and open it
     // as the stream 'cmd_verify_out'
     if (VERIFICATION_OUTPUT) {
         string basefilename = deviceIniFilename.substr(deviceIniFilename.find_last_of("/") + 1);
         string verify_filename = "sim_out_" + basefilename;
-        if (sim_description != NULL) {
+        if (sim_description) {
             verify_filename += "." + sim_description_str;
         }
         verify_filename += ".tmp";
@@ -206,9 +201,8 @@ MultiChannelMemorySystem::InitOutputFiles(string traceFilename)
     // This sets up the vis file output along with the creating the result
     // directory structure if it doesn't exist
     if (VIS_FILE_OUTPUT) {
-        stringstream out, tmpNum;
+        stringstream out;
         string path;
-        string filename;
 
         if (!visFilename) {
             path = "results/";
@@ -219,16 +213,25 @@ MultiChannelMemorySystem::InitOutputFiles(string traceFilename)
             }
 
             // chop off everything past the last / (i.e. leave filename only)
-            if ((lastSlash = deviceName.find_last_of("/")) != string::npos) {
-                deviceName = deviceName.substr(lastSlash + 1, deviceIniFilenameLength - lastSlash - 1);
+            {
+                auto const lastSlash = deviceName.find_last_of("/");
+
+                if (lastSlash != string::npos) {
+                    deviceName = deviceName.substr(lastSlash + 1, deviceIniFilenameLength - lastSlash - 1);
+                }
             }
 
             string rest;
-            // working backwards, chop off the next piece of the directory
-            if ((lastSlash = traceFilename.find_last_of("/")) != string::npos) {
-                traceFilename = traceFilename.substr(lastSlash + 1, traceFilename.length() - lastSlash - 1);
+            {
+                // working backwards, chop off the next piece of the directory
+                auto const lastSlash = traceFilename.find_last_of("/");
+
+                if (lastSlash != string::npos) {
+                    traceFilename = traceFilename.substr(lastSlash + 1, traceFilename.length() - lastSlash - 1);
+                }
             }
-            if (sim_description != NULL) {
+
+            if (sim_description) {
                 traceFilename += "." + sim_description_str;
             }
 
@@ -238,54 +241,47 @@ MultiChannelMemorySystem::InitOutputFiles(string traceFilename)
 
             // create the directories if they don't exist 
             mkdirIfNotExist(path);
-            path = path + traceFilename + "/";
+            path += traceFilename + "/";
             mkdirIfNotExist(path);
-            path = path + deviceName + "/";
+            path += deviceName + "/";
             mkdirIfNotExist(path);
 
             // finally, figure out the filename
             string sched = "BtR";
-            string queue = "pRank";
             if (schedulingPolicy == RankThenBankRoundRobin) {
                 sched = "RtB";
             }
-            if (queuingStructure == PerRankPerBank) {
-                queue = "pRankpBank";
-            }
+            string queue = queuingStructure == PerRankPerBank ? "pRankpBank" : "pRank";
 
             /* I really don't see how "the C++ way" is better than snprintf()  */
             out << (TOTAL_STORAGE >> 10) << "GB." << NUM_CHANS << "Ch." << NUM_RANKS << "R." << ADDRESS_MAPPING_SCHEME << "." << ROW_BUFFER_POLICY << "." << TRANS_QUEUE_DEPTH << "TQ." << CMD_QUEUE_DEPTH << "CQ." << sched << "." << queue;
-        } else //visFilename given
-        {
+        } else {
+            // visFilename given
             out << *visFilename;
         }
+
         if (sim_description) {
             out << "." << sim_description;
         }
 
-        //filename so far, without extension, see if it exists already
-        filename = out.str();
-
-
-        filename = FilenameWithNumberSuffix(filename, ".vis");
-        path.append(filename);
+        // filename so far, without extension, see if it exists already
+        path.append(FilenameWithNumberSuffix(out.str(), ".vis"));
         cerr << "writing vis file to " << path << endl;
-
-
         visDataOut.open(path.c_str());
+
         if (!visDataOut) {
             ERROR("Cannot open '" << path << "'");
             throw std::runtime_error("Cannot open");
         }
+
         //write out the ini config values for the visualizer tool
         IniReader::WriteValuesOut(visDataOut);
-
-    } else {
-        // cerr << "vis file output disabled\n";
     }
+
 #ifdef LOG_OUTPUT
     string dramsimLogFilename("dramsim");
-    if (sim_description != NULL) {
+
+    if (sim_description) {
         dramsimLogFilename += "." + sim_description_str;
     }
 
@@ -296,60 +292,58 @@ MultiChannelMemorySystem::InitOutputFiles(string traceFilename)
     if (!dramsim_log) {
         ERROR("Cannot open " << dramsimLogFilename);
     }
-#endif
-
+#endif  // LOG_OUTPUT
 }
 
 void
-MultiChannelMemorySystem::mkdirIfNotExist(string path)
+MultiChannelMemorySystem::mkdirIfNotExist(string const &path)
 {
     struct stat stat_buf;
     // check if the directory exists
     // nonzero return value on error, check errno
     if (stat(path.c_str(), &stat_buf) != 0) {
-        if (errno == ENOENT) {
-            // DEBUG("\t directory doesn't exist, trying to create ...");
-            // set permissions dwxr-xr-x on the results directories
-            mode_t mode = (S_IXOTH | S_IXGRP | S_IXUSR | S_IROTH | S_IRGRP | S_IRUSR | S_IWUSR);
-            if (mkdir(path.c_str(), mode) != 0) {
-                cerr << "Error Has occurred while trying to make directory: " << path << endl;
-                throw std::logic_error("Error Has occurred while trying to make directory");
-            }
-        } else {
+        if (errno != ENOENT) {
             throw std::logic_error("Something else when wrong");
+        }
+        // set permissions dwxr-xr-x on the results directories
+        mode_t mode = S_IXOTH | S_IXGRP | S_IXUSR | S_IROTH | S_IRGRP | S_IRUSR | S_IWUSR;
+
+        if (mkdir(path.c_str(), mode) != 0) {
+            cerr << "Error Has occurred while trying to make directory: " << path << endl;
+            throw std::logic_error("Error Has occurred while trying to make directory");
         }
     } else {
         // directory already exists
         if (!S_ISDIR(stat_buf.st_mode)) {
-            throw std::logic_error(std::string(path) + " is not a directory");
+            throw std::logic_error(path + " is not a directory");
         }
     }
 }
 
-
-MultiChannelMemorySystem::~MultiChannelMemorySystem()
+MultiChannelMemorySystem::~MultiChannelMemorySystem(void)
 {
-    for (size_t i = 0; i < NUM_CHANS; i++) {
-        delete channels[i];
+    for (auto const &channel: this->channels) {
+        delete channel;
     }
 
-    channels.clear();
+    this->channels.clear();
 
     // flush our streams and close them up
 #ifdef LOG_OUTPUT
-    dramsim_log.flush();
-    dramsim_log.close();
-#endif
+    this->dramsim_log.flush();
+    this->dramsim_log.close();
+#endif  // LOG_OUTPUT
+
     if (VIS_FILE_OUTPUT) {
-        visDataOut.flush();
-        visDataOut.close();
+        this->visDataOut.flush();
+        this->visDataOut.close();
     }
 }
 
 void
-MultiChannelMemorySystem::update()
+MultiChannelMemorySystem::update(void)
 {
-    clockDomainCrosser.update();
+    this->clockDomainCrosser.update();
 }
 
 void
@@ -362,16 +356,17 @@ MultiChannelMemorySystem::actual_update(void)
 
     if (currentClockCycle % EPOCH_LENGTH == 0) {
         (*csvOut) << "ms" << currentClockCycle * tCK * 1E-6;
-        for (size_t i = 0; i < NUM_CHANS; i++) {
-            channels[i]->printStats(false);
+
+        for (auto const channel: this->channels) {
+            channel->printStats(false);
         }
+
         csvOut->finalize();
     }
 
-    for (size_t i = 0; i < NUM_CHANS; i++) {
-        channels[i]->update();
+    for (auto const channel : this->channels) {
+        channel->update();
     }
-
 
     ++currentClockCycle;
 }
@@ -390,106 +385,126 @@ MultiChannelMemorySystem::findChannelNumber(uint64_t addr)
     }
 
     // only chan is used from this set 
-    unsigned channelNumber, rank, bank, row, col;
+    unsigned channelNumber;
+    unsigned rank;
+    unsigned bank;
+    unsigned row;
+    unsigned col;
     addressMapping(addr, channelNumber, rank, bank, row, col);
+
     if (channelNumber >= NUM_CHANS) {
         throw std::logic_error(std::string("Got channel index ") + std::to_string(channelNumber) + " but only " + std::to_string(NUM_CHANS) + " exist");
     }
-    //DEBUG("Channel idx = "<<channelNumber<<" totalbits="<<totalBits<<" channelbits="<<channelBits); 
 
     return channelNumber;
-
 }
 
-bool MultiChannelMemorySystem::addTransaction(const Transaction &trans)
+bool
+MultiChannelMemorySystem::addTransaction(const Transaction &trans)
 {
     // copy the transaction and send the pointer to the new transaction 
-    return addTransaction(new Transaction(trans));
+    return this->addTransaction(new Transaction(trans));
 }
 
-bool MultiChannelMemorySystem::addTransaction(Transaction *trans)
+bool
+MultiChannelMemorySystem::addTransaction(Transaction *const trans)
 {
-    unsigned channelNumber = findChannelNumber(trans->address);
-    return channels[channelNumber]->addTransaction(trans);
+    return this->channels[this->findChannelNumber(trans->address)]->addTransaction(trans);
 }
 
-bool MultiChannelMemorySystem::addTransaction(bool isWrite, uint64_t addr)
+bool
+MultiChannelMemorySystem::addTransaction(bool const isWrite,
+                                         uint64_t const addr)
 {
-    unsigned channelNumber = findChannelNumber(addr);
-    return channels[channelNumber]->addTransaction(isWrite, addr);
+    return this->channels[this->findChannelNumber(addr)]->addTransaction(isWrite, addr);
 }
 
-/*
-        This function has two flavors: one with and without the address.
-        If the simulator won't give us an address and we have multiple channels,
-        we have to assume the worst and return false if any channel won't accept.
+/**
+    This function has two flavors: one with and without the address.
+    If the simulator won't give us an address and we have multiple channels,
+    we have to assume the worst and return false if any channel won't accept.
 
-        However, if the address is given, we can just map the channel and check just
-        that memory controller
+    However, if the address is given, we can just map the channel and check just
+    that memory controller
 */
-
-bool MultiChannelMemorySystem::willAcceptTransaction(uint64_t addr)
+bool
+MultiChannelMemorySystem::willAcceptTransaction(uint64_t const addr)
 {
-    unsigned chan, rank, bank, row, col;
+    unsigned chan;
+    unsigned rank;
+    unsigned bank;
+    unsigned row;
+    unsigned col;
     addressMapping(addr, chan, rank, bank, row, col);
-    return channels[chan]->WillAcceptTransaction();
+    return this->channels[chan]->WillAcceptTransaction();
 }
 
-bool MultiChannelMemorySystem::willAcceptTransaction()
+bool
+MultiChannelMemorySystem::willAcceptTransaction(void)
 {
-    for (size_t c = 0; c < NUM_CHANS; c++) {
-        if (!channels[c]->WillAcceptTransaction()) {
+    for (auto channel: this->channels) {
+        if (!channel->WillAcceptTransaction()) {
             return false;
         }
     }
+
     return true;
 }
 
-
-
-void MultiChannelMemorySystem::printStats(bool finalStats)
+void
+MultiChannelMemorySystem::printStats(bool const finalStats)
 {
-
     (*csvOut) << "ms" << currentClockCycle * tCK * 1E-6;
+
     for (size_t i = 0; i < NUM_CHANS; i++) {
         PRINT("==== Channel [" << i << "] ====");
         channels[i]->printStats(finalStats);
         PRINT("//// Channel [" << i << "] ////");
     }
+
     csvOut->finalize();
 }
-void MultiChannelMemorySystem::RegisterCallbacks(
-                TransactionCompleteCB *readDone,
-                TransactionCompleteCB *writeDone,
-                void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower))
+
+void
+MultiChannelMemorySystem::RegisterCallbacks(TransactionCompleteCB *readDone,
+                                            TransactionCompleteCB *writeDone,
+                                            void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower))
 {
-    for (size_t i = 0; i < NUM_CHANS; i++) {
-        channels[i]->RegisterCallbacks(readDone, writeDone, reportPower);
+    for (auto channel: this->channels) {
+        channel->RegisterCallbacks(readDone, writeDone, reportPower);
     }
 }
 
-/*
+/**
  * The getters below are useful to external simulators interfacing with DRAMSim
  *
- * Return value: 0 on success, -1 on error
+ * @return value: 0 on success, -1 on error
  */
-int MultiChannelMemorySystem::getIniBool(const std::string& field, bool *val)
+int
+MultiChannelMemorySystem::getIniBool(std::string const &field,
+                                     bool *const val)
 {
     if (!IniReader::CheckIfAllSet()) {
         throw std::logic_error("!IniReader::CheckIfAllSet");
     }
+
     return IniReader::getBool(field, val);
 }
 
-int MultiChannelMemorySystem::getIniUint(const std::string& field, unsigned int *val)
+int
+MultiChannelMemorySystem::getIniUint(const std::string& field,
+                                     unsigned *const val)
 {
     if (!IniReader::CheckIfAllSet()) {
         throw std::logic_error("!IniReader::CheckIfAllSet()");
     }
+
     return IniReader::getUint(field, val);
 }
 
-int MultiChannelMemorySystem::getIniUint64(const std::string& field, uint64_t *val)
+int
+MultiChannelMemorySystem::getIniUint64(std::string const &field,
+                                       uint64_t *const val)
 {
     if (!IniReader::CheckIfAllSet()) {
         throw std::logic_error("!IniReader::CheckIfAllSet()");
@@ -498,7 +513,9 @@ int MultiChannelMemorySystem::getIniUint64(const std::string& field, uint64_t *v
     return IniReader::getUint64(field, val);
 }
 
-int MultiChannelMemorySystem::getIniFloat(const std::string& field, float *val)
+int
+MultiChannelMemorySystem::getIniFloat(std::string const &field,
+                                      float *val)
 {
     if (!IniReader::CheckIfAllSet()) {
         throw std::logic_error("!IniReader::CheckIfAllSet()");
@@ -508,8 +525,14 @@ int MultiChannelMemorySystem::getIniFloat(const std::string& field, float *val)
 }
 
 MultiChannelMemorySystem *
-getMemorySystemInstance(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, string *visfilename)
+getMemorySystemInstance(string const &dev,
+                        string const &sys,
+                        string const &pwd,
+                        string const &trc,
+                        unsigned const megsOfMemory,
+                        string *const visfilename)
 {
     return new MultiChannelMemorySystem(dev, sys, pwd, trc, megsOfMemory, visfilename);
 }
+
 }  // namespace DRAMSim

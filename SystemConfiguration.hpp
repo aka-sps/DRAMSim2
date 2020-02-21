@@ -43,7 +43,7 @@
 #endif
 
 namespace DRAMSim {
-//number of latencies per bucket in the latency histogram
+// number of latencies per bucket in the latency histogram
 // @todo move to system ini file
 static constexpr auto const HISTOGRAM_BIN_SIZE = 10;
 

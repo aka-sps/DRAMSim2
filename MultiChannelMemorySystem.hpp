@@ -75,16 +75,16 @@ public:
         return dramsim_log;
     }
 
-    void RegisterCallbacks(
-            TransactionCompleteCB *readDone,
-            TransactionCompleteCB *writeDone,
-            void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
+    void
+        RegisterCallbacks(TransactionCompleteCB *readDone,
+                          TransactionCompleteCB *writeDone,
+                          void(*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
     int
         getIniBool(const std::string &field,
                    bool *val);
     int
-        getIniUint(const std::string &field,
-                   unsigned int *val);
+        getIniUint(std::string const &field,
+                   unsigned *val);
     int
         getIniUint64(const std::string &field,
                      uint64_t *val);
@@ -105,6 +105,10 @@ private:
         findChannelNumber(uint64_t addr);
     void
         actual_update(void);
+    static void
+        mkdirIfNotExist(std::string const& path);
+    static bool
+        fileExists(std::string path);
 
     std::vector<MemorySystem*> channels;
     unsigned megsOfMemory;
@@ -114,10 +118,7 @@ private:
     std::string pwd;
     std::string *visFilename;
     ClockDomain::ClockDomainCrosser clockDomainCrosser;
-    static void
-        mkdirIfNotExist(std::string path);
-    static bool
-        fileExists(std::string path);
     CSVWriter *csvOut;
 };
+
 }  // namespace DRAMSim

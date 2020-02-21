@@ -128,7 +128,6 @@ SchedulingPolicy schedulingPolicy;
 AddressMappingScheme addressMappingScheme;
 QueuingStructure queuingStructure;
 
-
 //Map the string names to the variables they set
 static ConfigMap configMap[] =
 {
@@ -347,7 +346,9 @@ void IniReader::SetKey(string key, string valueString, bool isSystemParam, size_
     }
 }
 
-void IniReader::ReadIniFile(string filename, bool isSystemFile)
+void
+IniReader::ReadIniFile(string filename,
+                       bool isSystemFile)
 {
     ifstream iniFile;
     string line;
@@ -426,7 +427,8 @@ void IniReader::ReadIniFile(string filename, bool isSystemFile)
     COL_LOW_BIT_WIDTH = THROW_AWAY_BITS - BYTE_OFFSET_WIDTH;
 }
 
-void IniReader::OverrideKeys(const OverrideMap * map)
+void
+IniReader::OverrideKeys(OverrideMap const *const map)
 {
     if (!map) {
         return;
@@ -443,7 +445,8 @@ void IniReader::OverrideKeys(const OverrideMap * map)
     }
 }
 
-bool IniReader::CheckIfAllSet()
+bool
+IniReader::CheckIfAllSet(void)
 {
     // check to make sure all parameters that we expected were set
     for (size_t i = 0; configMap[i].variablePtr != NULL; i++) {

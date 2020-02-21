@@ -26,14 +26,13 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 
 /// Class file for transaction object
 ///	Transaction is considered requests sent from the CPU to
 ///	the memory controller (read, write, etc.)...
 
 #include "Transaction.hpp"
-#include "PrintMacros.hpp"
 #include "SystemConfiguration.hpp"
 
 namespace DRAMSim {

@@ -29,10 +29,9 @@
 *********************************************************************************/
 // Class file for memory controller object
 
-#include "MemoryController.hpp"
+#include "MemorySystem.hpp"
 #include "AddressMapping.hpp"
 #include "SystemConfiguration.hpp"
-#include "MemorySystem.hpp"
 
 #include <algorithm>
 

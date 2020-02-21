@@ -59,8 +59,9 @@ template<
     typename ReturnT,
     typename Param1T,
     typename Param2T,
-    typename Param3T>
-    class Callback
+    typename Param3T
+>
+class Callback
     : public CallbackBase<ReturnT, Param1T, Param2T, Param3T>
 {
     typedef Callback<ConsumerT, ReturnT, Param1T, Param2T, Param3T> This_class;
@@ -83,7 +84,7 @@ public:
                    Param2T param2,
                    Param3T param3)
     {
-        return (const_cast<ConsumerT*>(object)->*member)(param1, param2, param3);
+        return (object->*member)(param1, param2, param3);
     }
 
 private:
