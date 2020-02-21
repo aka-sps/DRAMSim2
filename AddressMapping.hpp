@@ -1,5 +1,5 @@
-/*********************************************************************************
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+/** @file
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
@@ -29,9 +29,17 @@
 *********************************************************************************/
 #ifndef ADDRESS_MAPPING_HPP
 #define ADDRESS_MAPPING_HPP
-namespace DRAMSim
-{
-	void addressMapping(uint64_t physicalAddress, unsigned &channel, unsigned &rank, unsigned &bank, unsigned &row, unsigned &col);
-}
 
-#endif
+#include <cstdint>  // uint64_t
+
+namespace DRAMSim {
+void
+addressMapping(uint64_t physicalAddress,
+               unsigned &channel,
+               unsigned &rank,
+               unsigned &bank,
+               unsigned &row,
+               unsigned &col);
+}  // namespace DRAMSim
+
+#endif  // ADDRESS_MAPPING_HPP
