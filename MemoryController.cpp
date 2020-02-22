@@ -26,12 +26,11 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 // Class file for memory controller object
 
 #include "MemorySystem.hpp"
 #include "AddressMapping.hpp"
-#include "SystemConfiguration.hpp"
 
 #include <algorithm>
 
@@ -39,24 +38,6 @@
 namespace DRAMSim {
 
 using namespace std;
-
-/* Power computations are localized to MemoryController.cpp */
-extern unsigned IDD0;
-extern unsigned IDD1;
-extern unsigned IDD2P;
-extern unsigned IDD2Q;
-extern unsigned IDD2N;
-extern unsigned IDD3Pf;
-extern unsigned IDD3Ps;
-extern unsigned IDD3N;
-extern unsigned IDD4W;
-extern unsigned IDD4R;
-extern unsigned IDD5;
-extern unsigned IDD6;
-extern unsigned IDD6L;
-extern unsigned IDD7;
-extern float Vdd;
-
 
 MemoryController::MemoryController(MemorySystem *parent,
                                    CSVWriter &csvOut_,
@@ -74,8 +55,8 @@ MemoryController::MemoryController(MemorySystem *parent,
 
 
     //bus related fields
-    outgoingCmdPacket = NULL;
-    outgoingDataPacket = NULL;
+    outgoingCmdPacket = nullptr;
+    outgoingDataPacket = nullptr;
     dataCyclesLeft = 0;
     cmdCyclesLeft = 0;
 
@@ -183,26 +164,26 @@ void MemoryController::update()
 
 
     //check for outgoing command packets and handle countdowns
-    if (outgoingCmdPacket != NULL) {
+    if (outgoingCmdPacket != nullptr) {
         cmdCyclesLeft--;
         if (cmdCyclesLeft == 0) //packet is ready to be received by rank
         {
             (*ranks)[outgoingCmdPacket->rank]->receiveFromBus(outgoingCmdPacket);
-            outgoingCmdPacket = NULL;
+            outgoingCmdPacket = nullptr;
         }
     }
 
     //check for outgoing data packets and handle countdowns
-    if (outgoingDataPacket != NULL) {
+    if (outgoingDataPacket != nullptr) {
         dataCyclesLeft--;
         if (dataCyclesLeft == 0) {
             //inform upper levels that a write is done
-            if (parentMemorySystem->WriteDataDone != NULL) {
+            if (parentMemorySystem->WriteDataDone != nullptr) {
                 (*parentMemorySystem->WriteDataDone)(parentMemorySystem->systemID, outgoingDataPacket->physicalAddress, currentClockCycle);
             }
 
             (*ranks)[outgoingDataPacket->rank]->receiveFromBus(outgoingDataPacket);
-            outgoingDataPacket = NULL;
+            outgoingDataPacket = nullptr;
         }
     }
 
@@ -225,7 +206,7 @@ void MemoryController::update()
             }
 
             // queue up the packet to be sent
-            if (outgoingDataPacket != NULL) {
+            if (outgoingDataPacket != nullptr) {
                 ERROR("== Error - Data Bus Collision");
                 throw std::logic_error("Data Bus Collision");
             }
@@ -427,7 +408,7 @@ void MemoryController::update()
         }
 
         //check for collision on bus
-        if (outgoingCmdPacket != NULL) {
+        if (outgoingCmdPacket != nullptr) {
             ERROR("== Error - Command Bus Collision");
             throw std::logic_error("Command Bus Collision");
         }
@@ -755,7 +736,7 @@ void MemoryController::printStats(bool finalStats)
         actprePower[r] = ((double)actpreEnergy[r] / (double)(cyclesElapsed)) * Vdd / 1000.0;
         averagePower[r] = ((backgroundEnergy[r] + burstEnergy[r] + refreshEnergy[r] + actpreEnergy[r]) / (double)cyclesElapsed) * Vdd / 1000.0;
 
-        if ((*parentMemorySystem->ReportPower) != NULL) {
+        if ((*parentMemorySystem->ReportPower) != nullptr) {
             (*parentMemorySystem->ReportPower)(backgroundPower[r], burstPower[r], refreshPower[r], actprePower[r]);
         }
 

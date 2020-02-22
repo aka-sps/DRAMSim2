@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 #include "IniReader.hpp"
 
 #include <sstream>
@@ -34,101 +34,9 @@
 namespace DRAMSim {
 using namespace std;
 
-// these are the values that are extern'd in SystemConfig.hpp so that they
-// have global scope even though they are set by IniReader
+static bool DEBUG_INI_READER = false;
 
-uint64_t TOTAL_STORAGE;
-unsigned NUM_BANKS;
-unsigned NUM_BANKS_LOG;
-unsigned NUM_CHANS;
-unsigned NUM_CHANS_LOG;
-unsigned NUM_ROWS;
-unsigned NUM_ROWS_LOG;
-unsigned NUM_COLS;
-unsigned NUM_COLS_LOG;
-unsigned DEVICE_WIDTH;
-unsigned BYTE_OFFSET_WIDTH;
-unsigned TRANSACTION_SIZE;
-unsigned THROW_AWAY_BITS;
-unsigned COL_LOW_BIT_WIDTH;
-
-unsigned REFRESH_PERIOD;
-float tCK;
-float Vdd;
-unsigned CL;
-unsigned AL;
-unsigned BL;
-unsigned tRAS;
-unsigned tRCD;
-unsigned tRRD;
-unsigned tRC;
-unsigned tRP;
-unsigned tCCD;
-unsigned tRTP;
-unsigned tWTR;
-unsigned tWR;
-unsigned tRTRS;
-unsigned tRFC;
-unsigned tFAW;
-unsigned tCKE;
-unsigned tXP;
-unsigned tCMD;
-
-unsigned IDD0;
-unsigned IDD1;
-unsigned IDD2P;
-unsigned IDD2Q;
-unsigned IDD2N;
-unsigned IDD3Pf;
-unsigned IDD3Ps;
-unsigned IDD3N;
-unsigned IDD4W;
-unsigned IDD4R;
-unsigned IDD5;
-unsigned IDD6;
-unsigned IDD6L;
-unsigned IDD7;
-
-
-//in bytes
-unsigned JEDEC_DATA_BUS_BITS;
-
-//Memory Controller related parameters
-unsigned TRANS_QUEUE_DEPTH;
-unsigned CMD_QUEUE_DEPTH;
-
-//cycles within an epoch
-unsigned EPOCH_LENGTH;
-
-//row accesses allowed before closing (open page)
-unsigned TOTAL_ROW_ACCESSES;
-
-// strings and their associated enums
-string ROW_BUFFER_POLICY;
-string SCHEDULING_POLICY;
-string ADDRESS_MAPPING_SCHEME;
-string QUEUING_STRUCTURE;
-
-bool DEBUG_TRANS_Q = false;
-bool DEBUG_CMD_Q;
-bool DEBUG_ADDR_MAP;
-bool DEBUG_BANKSTATE;
-bool DEBUG_BUS;
-bool DEBUG_BANKS;
-bool DEBUG_POWER;
-bool USE_LOW_POWER;
-bool VIS_FILE_OUTPUT;
-
-bool VERIFICATION_OUTPUT;
-
-bool DEBUG_INI_READER = false;
-
-RowBufferPolicy rowBufferPolicy;
-SchedulingPolicy schedulingPolicy;
-AddressMappingScheme addressMappingScheme;
-QueuingStructure queuingStructure;
-
-//Map the string names to the variables they set
+// Map the string names to the variables they set
 static ConfigMap configMap[] =
 {
     //DEFINE_UINT_PARAM -- see IniReader.h
@@ -198,12 +106,14 @@ static ConfigMap configMap[] =
     DEFINE_BOOL_PARAM(DEBUG_POWER, SYS_PARAM),
     DEFINE_BOOL_PARAM(VIS_FILE_OUTPUT, SYS_PARAM),
     DEFINE_BOOL_PARAM(VERIFICATION_OUTPUT, SYS_PARAM),
-    {"", NULL, UINT, SYS_PARAM, false} // tracer value to signify end of list; if you delete it, epic fail will result
+    {"", nullptr, UINT, SYS_PARAM, false} // tracer value to signify end of list; if you delete it, epic fail will result
 };
 
-void IniReader::WriteParams(std::ofstream & visDataOut, paramType type)
+void
+IniReader::WriteParams(std::ofstream & visDataOut,
+                       paramType type)
 {
-    for (size_t i = 0; configMap[i].variablePtr != NULL; i++) {
+    for (size_t i = 0; configMap[i].variablePtr != nullptr; ++i) {
         if (configMap[i].parameterType == type) {
             visDataOut << configMap[i].iniKey << "=";
 
@@ -262,7 +172,7 @@ void IniReader::SetKey(string key, string valueString, bool isSystemParam, size_
     uint64_t int64Value;
     float floatValue;
 
-    for (i = 0; configMap[i].variablePtr != NULL; i++) {
+    for (i = 0; configMap[i].variablePtr != nullptr; i++) {
         istringstream iss(valueString);
 
         // match up the string in the config map with the key we parsed
@@ -341,7 +251,7 @@ void IniReader::SetKey(string key, string valueString, bool isSystemParam, size_
         }
     }
 
-    if (configMap[i].variablePtr == NULL) {
+    if (configMap[i].variablePtr == nullptr) {
         DEBUG("WARNING: UNKNOWN KEY '" << key << "' IN INI FILE");
     }
 }
@@ -449,7 +359,7 @@ bool
 IniReader::CheckIfAllSet(void)
 {
     // check to make sure all parameters that we expected were set
-    for (size_t i = 0; configMap[i].variablePtr != NULL; i++) {
+    for (size_t i = 0; configMap[i].variablePtr != nullptr; i++) {
         if (!configMap[i].wasSet) {
             DEBUG("WARNING: KEY " << configMap[i].iniKey << " NOT FOUND IN INI FILE.");
 
@@ -487,7 +397,7 @@ IniReader::CheckIfAllSet(void)
     {                               \
         int i;                          \
         \
-        for (i=0; configMap[i].variablePtr != NULL; i++)    \
+        for (i=0; configMap[i].variablePtr != nullptr; i++)    \
         {                           \
             if (field.compare(configMap[i].iniKey))     \
                 continue;               \

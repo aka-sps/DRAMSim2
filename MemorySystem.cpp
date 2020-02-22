@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 #include "MemorySystem.hpp"
 #include "IniReader.hpp"
 
@@ -42,12 +42,6 @@ void libdramsim_is_present(void)
 
 namespace DRAMSim {
 using namespace std;
-
-ofstream cmd_verify_out; //used in Rank.cpp and MemoryController.cpp if VERIFICATION_OUTPUT is set
-
-unsigned NUM_DEVICES;
-unsigned NUM_RANKS;
-unsigned NUM_RANKS_LOG;
 
 powerCallBack_t MemorySystem::ReportPower = nullptr;
 
@@ -175,7 +169,7 @@ MemorySystem::addTransaction(bool isWrite,
                              uint64_t addr)
 {
     TransactionType type = isWrite ? DATA_WRITE : DATA_READ;
-    Transaction *trans = new Transaction(type, addr, NULL);
+    Transaction *trans = new Transaction(type, addr, nullptr);
     // push_back in memoryController will make a copy of this during
     // addTransaction so it's kosher for the reference to be local 
 

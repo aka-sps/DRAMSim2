@@ -22,6 +22,7 @@ set(SRC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/PrintMacros.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Rank.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/SimulatorObject.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/SystemConfiguration.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/Transaction.cpp
 )
 
