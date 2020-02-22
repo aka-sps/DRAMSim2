@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 #include "BusPacket.hpp"
 
 #include "SystemConfiguration.hpp"
@@ -132,7 +132,7 @@ BusPacket::print(void)
 void
 BusPacket::printData(void) const
 {
-    if (this->data == NULL) {
+    if (this->data == nullptr) {
         PRINTN("NO DATA");
         return;
     }

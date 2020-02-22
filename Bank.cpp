@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 
 #include "Bank.hpp"
 
@@ -61,7 +61,7 @@ Bank::Bank(ostream &dramsim_log_)
 
 Bank::DataStruct *Bank::searchForRow(unsigned row, DataStruct *head)
 {
-    while (head != NULL) {
+    while (head != nullptr) {
         if (head->row == row) {
             //found it
             return head;
@@ -70,7 +70,7 @@ Bank::DataStruct *Bank::searchForRow(unsigned row, DataStruct *head)
         head = head->next;
     }
     //if we get here, didn't find it
-    return NULL;
+    return nullptr;
 }
 
 void
@@ -107,9 +107,9 @@ Bank::write(const BusPacket *busPacket)
 
     // head of the list we need to search
     DataStruct *rowHeadNode = rowEntries[busPacket->column];
-    DataStruct *foundNode = NULL;
+    DataStruct *foundNode = nullptr;
 
-    if ((foundNode = Bank::searchForRow(busPacket->row, rowHeadNode)) == NULL) {
+    if ((foundNode = Bank::searchForRow(busPacket->row, rowHeadNode)) == nullptr) {
         //not found
         DataStruct *newRowNode = (DataStruct *)malloc(sizeof(DataStruct));
 

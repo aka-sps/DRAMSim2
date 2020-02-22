@@ -51,7 +51,7 @@ Transaction::Transaction(TransactionType transType,
 Transaction::Transaction(const Transaction &t)
     : transactionType(t.transactionType)
     , address(t.address)
-    , data(NULL)
+    , data(nullptr)
     , timeAdded(t.timeAdded)
     , timeReturned(t.timeReturned)
 {

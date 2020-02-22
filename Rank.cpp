@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 #include "Rank.hpp"
 #include "MemoryController.hpp"
 #include "SystemConfiguration.hpp"
@@ -267,12 +267,12 @@ Rank::update()
 {
     // An outgoing packet is one that is currently sending on the bus
     // do the book keeping for the packet's time left on the bus
-    if (outgoingDataPacket != NULL) {
+    if (outgoingDataPacket != nullptr) {
         dataCyclesLeft--;
         if (dataCyclesLeft == 0) {
             //if the packet is done on the bus, call receiveFromBus and free up the bus
             this->memoryController->receiveFromBus(outgoingDataPacket);
-            outgoingDataPacket = NULL;
+            outgoingDataPacket = nullptr;
         }
     }
 

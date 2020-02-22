@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 /// File to run a trace-based simulation
 
 #include "MemorySystem.hpp"
@@ -139,7 +139,7 @@ parseTraceFileLine(string &line,
 {
     size_t previousIndex = 0;
     size_t spaceIndex = 0;
-    uint64_t *dataBuffer = NULL;
+    uint64_t *dataBuffer = nullptr;
     string addressStr = "", cmdStr = "", dataStr = "", ccStr = "";
 
     switch (type) {
@@ -253,7 +253,7 @@ parseTraceFileLine(string &line,
             }
 
             //parse data
-            //if we are running in a no storage mode, don't allocate space, just return NULL
+            //if we are running in a no storage mode, don't allocate space, just return nullptr
 #ifndef NO_STORAGE
             if (dataStr.size() > 0 && transType == DATA_WRITE) {
                 // 32 bytes of data per transaction
@@ -341,11 +341,11 @@ main(int argc, char **argv)
     string systemIniFilename("system.ini");
     string deviceIniFilename;
     string pwdString;
-    string *visFilename = NULL;
+    string *visFilename = nullptr;
     unsigned megsOfMemory = 2048;
     bool useClockCycle = true;
 
-    IniReader::OverrideMap *paramOverrides = NULL;
+    IniReader::OverrideMap *paramOverrides = nullptr;
 
     unsigned numCycles = 1000;
     //getopt stuff
@@ -473,7 +473,7 @@ main(int argc, char **argv)
     /* create and register our callback functions */
     Callback_t *read_cb = new Callback<TransactionReceiver, void, unsigned, uint64_t, uint64_t>(&transactionReceiver, &TransactionReceiver::read_complete);
     Callback_t *write_cb = new Callback<TransactionReceiver, void, unsigned, uint64_t, uint64_t>(&transactionReceiver, &TransactionReceiver::write_complete);
-    memorySystem->RegisterCallbacks(read_cb, write_cb, NULL);
+    memorySystem->RegisterCallbacks(read_cb, write_cb, nullptr);
 #endif
 
 
@@ -481,9 +481,9 @@ main(int argc, char **argv)
     uint64_t clockCycle = 0;
     enum TransactionType transType;
 
-    void *data = NULL;
+    void *data = nullptr;
     int lineNumber = 0;
-    Transaction *trans = NULL;
+    Transaction *trans = nullptr;
     bool pendingTrans = false;
 
     traceFile.open(traceFileName.c_str());
@@ -511,7 +511,7 @@ main(int argc, char **argv)
                             transactionReceiver.add_pending(trans, i);
 #endif
                             // the memory system accepted our request so now it takes ownership of it
-                            trans = NULL;
+                            trans = nullptr;
                         }
                     } else {
                         pendingTrans = true;
@@ -530,7 +530,7 @@ main(int argc, char **argv)
 #ifdef RETURN_TRANSACTIONS
                 transactionReceiver.add_pending(trans, i);
 #endif
-                trans = NULL;
+                trans = nullptr;
             }
         }
 
