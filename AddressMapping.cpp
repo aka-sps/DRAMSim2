@@ -26,7 +26,7 @@
 *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*********************************************************************************/
+*/
 #include "AddressMapping.hpp"
 #include "SystemConfiguration.hpp"
 
@@ -40,16 +40,15 @@ addressMapping(uint64_t physicalAddress,
                unsigned &newTransactionRow,
                unsigned &newTransactionColumn)
 {
-    uint64_t tempA, tempB;
-    unsigned transactionSize = TRANSACTION_SIZE;
-    uint64_t transactionMask = transactionSize - 1; //ex: (64 bit bus width) x (8 Burst Length) - 1 = 64 bytes - 1 = 63 = 0x3f mask
-    unsigned channelBitWidth = NUM_CHANS_LOG;
-    unsigned rankBitWidth = NUM_RANKS_LOG;
-    unsigned bankBitWidth = NUM_BANKS_LOG;
-    unsigned rowBitWidth = NUM_ROWS_LOG;
-    unsigned colBitWidth = NUM_COLS_LOG;
+    unsigned const transactionSize = TRANSACTION_SIZE;
+    uint64_t const transactionMask = transactionSize - 1; // ex: (64 bit bus width) x (8 Burst Length) - 1 = 64 bytes - 1 = 63 = 0x3f mask
+    unsigned const channelBitWidth = NUM_CHANS_LOG;
+    unsigned const rankBitWidth = NUM_RANKS_LOG;
+    unsigned const bankBitWidth = NUM_BANKS_LOG;
+    unsigned const rowBitWidth = NUM_ROWS_LOG;
+    unsigned const colBitWidth = NUM_COLS_LOG;
     // this forces the alignment to the width of a single burst (64 bits = 8 bytes = 3 address bits for DDR parts)
-    unsigned byteOffsetWidth = BYTE_OFFSET_WIDTH;
+    unsigned const byteOffsetWidth = BYTE_OFFSET_WIDTH;
     // Since we're assuming that a request is for BL*BUS_WIDTH, the bottom bits
     // of this address *should* be all zeros if it's not, issue a warning
 
@@ -58,7 +57,7 @@ addressMapping(uint64_t physicalAddress,
     }
 
     // each burst will contain JEDEC_DATA_BUS_BITS/8 bytes of data, so the bottom bits (3 bits for a single channel DDR system) are
-    // 	thrown away before mapping the other bits
+    // thrown away before mapping the other bits
     physicalAddress >>= byteOffsetWidth;
 
     // The next thing we have to consider is that when a request is made for a
@@ -81,7 +80,8 @@ addressMapping(uint64_t physicalAddress,
     unsigned colLowBitWidth = COL_LOW_BIT_WIDTH;
 
     physicalAddress >>= colLowBitWidth;
-    unsigned colHighBitWidth = colBitWidth - colLowBitWidth;
+    unsigned const colHighBitWidth = colBitWidth - colLowBitWidth;
+
     if (DEBUG_ADDR_MAP) {
         DEBUG("Bit widths: ch:" << channelBitWidth << " r:" << rankBitWidth << " b:" << bankBitWidth
                         << " row:" << rowBitWidth << " colLow:" << colLowBitWidth
@@ -92,195 +92,265 @@ addressMapping(uint64_t physicalAddress,
     //perform various address mapping schemes
     if (addressMappingScheme == Scheme1) {
         //chan:rank:row:col:bank
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
 
     } else if (addressMappingScheme == Scheme2) {
         //chan:row:col:bank:rank
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
 
     } else if (addressMappingScheme == Scheme3) {
         //chan:rank:bank:col:row
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
 
     } else if (addressMappingScheme == Scheme4) {
         //chan:rank:bank:row:col
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
 
     } else if (addressMappingScheme == Scheme5) {
         //chan:row:col:rank:bank
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
 
 
     } else if (addressMappingScheme == Scheme6) {
         //chan:row:bank:rank:col
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
     } else if (addressMappingScheme == Scheme7) {
         // clone of scheme 5, but channel moved to lower bits
         //row:col:rank:bank:chan
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> channelBitWidth;
-        tempB = physicalAddress << channelBitWidth;
-        newTransactionChan = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= channelBitWidth;
+            auto const tempB = physicalAddress << channelBitWidth;
+            newTransactionChan = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> bankBitWidth;
-        tempB = physicalAddress << bankBitWidth;
-        newTransactionBank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= bankBitWidth;
+            auto const tempB = physicalAddress << bankBitWidth;
+            newTransactionBank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rankBitWidth;
-        tempB = physicalAddress << rankBitWidth;
-        newTransactionRank = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rankBitWidth;
+            auto const tempB = physicalAddress << rankBitWidth;
+            newTransactionRank = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> colHighBitWidth;
-        tempB = physicalAddress << colHighBitWidth;
-        newTransactionColumn = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= colHighBitWidth;
+            auto const tempB = physicalAddress << colHighBitWidth;
+            newTransactionColumn = tempA ^ tempB;
+        }
 
-        tempA = physicalAddress;
-        physicalAddress = physicalAddress >> rowBitWidth;
-        tempB = physicalAddress << rowBitWidth;
-        newTransactionRow = tempA ^ tempB;
+        {
+            auto const tempA = physicalAddress;
+            physicalAddress >>= rowBitWidth;
+            auto const tempB = physicalAddress << rowBitWidth;
+            newTransactionRow = tempA ^ tempB;
+        }
 
     } else {
         throw std::logic_error("== Error - Unknown Address Mapping Scheme");
