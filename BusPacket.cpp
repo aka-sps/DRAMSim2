@@ -140,6 +140,7 @@ BusPacket::printData(void) const
     PRINTN("'" << hex);
 
     for (int i = 0; i < 4; ++i) {
+        /// @bug endian
         PRINTN(static_cast<uint64_t const*>(this->data)[i]);
     }
 

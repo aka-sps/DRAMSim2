@@ -47,6 +47,7 @@ ClockDomainCrosser::ClockDomainCrosser(double ratio, ClockUpdateCB *_callback)
         zs[i + 1] = 1.0f / (zs[i] - (int)floor(zs[i])); // 1/(fractional part of z_i)
         ds[i + 1] = ds[i] * (int)floor(zs[i + 1]) + ds[i - 1];
         double const tmp = x*ds[i + 1];
+        /// @todo fprem
         double const tmp2 = tmp - static_cast<int>(tmp);
         ns[i + 1] = tmp2 >= 0.5 ? ceil(tmp) : floor(tmp); // ghetto implementation of a rounding function
     }

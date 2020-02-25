@@ -36,7 +36,8 @@
 namespace DRAMSim {
 using namespace std;
 
-CommandQueue::CommandQueue(vector< vector<BankState>> &states, ostream & dramsim_log_)
+CommandQueue::CommandQueue(std::vector<std::vector<BankState> > &states,
+                           std::ostream & dramsim_log_)
     : dramsim_log(dramsim_log_)
     , bankStates(states)
     , nextBank(0)

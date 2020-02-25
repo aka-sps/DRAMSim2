@@ -34,6 +34,8 @@
 #include <iosfwd>
 #include <cstdint>
 
+/// @defgroup DRAMSim DDR emulation
+///@{
 namespace DRAMSim {
 enum BusPacketType
 {
@@ -80,6 +82,6 @@ public:
 };
 
 }  // namespace DRAMSim
+///@}
 
-#endif
-
+#endif  // BUSPACKET_HPP
