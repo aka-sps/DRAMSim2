@@ -167,7 +167,7 @@ parseTraceFileLine(string &line,
                 transType = DATA_READ;
             } else {
                 ERROR("== Unknown Command : " << cmdStr);
-                exit(0);
+                throw std::logic_error("Unknown Command");
             }
 
             istringstream a(addressStr.substr(2));//gets rid of 0x
