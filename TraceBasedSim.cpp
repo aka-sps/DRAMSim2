@@ -157,13 +157,13 @@ parseTraceFileLine(string &line,
             spaceIndex = line.find_first_not_of(" ", previousIndex);
             ccStr = line.substr(spaceIndex, line.find_first_of(" ", spaceIndex) - spaceIndex);
 
-            if (cmdStr.compare("P_MEM_WR") == 0 ||
-                    cmdStr.compare("BOFF") == 0) {
+            if (cmdStr.compare("P_MEM_WR") == 0 || cmdStr.compare("BOFF") == 0) {
                 transType = DATA_WRITE;
             } else if (cmdStr.compare("P_FETCH") == 0 ||
                      cmdStr.compare("P_MEM_RD") == 0 ||
                      cmdStr.compare("P_LOCK_RD") == 0 ||
-                     cmdStr.compare("P_LOCK_WR") == 0) {
+                     cmdStr.compare("P_LOCK_WR") == 0
+            ) {
                 transType = DATA_READ;
             } else {
                 ERROR("== Unknown Command : " << cmdStr);
@@ -196,13 +196,13 @@ parseTraceFileLine(string &line,
             spaceIndex = line.find_first_not_of(" ", previousIndex);
             ccStr = line.substr(spaceIndex, line.find_first_of(" ", spaceIndex) - spaceIndex);
 
-            if (cmdStr.compare("IFETCH") == 0 ||
-                    cmdStr.compare("READ") == 0) {
+            if (cmdStr.compare("IFETCH") == 0 || cmdStr.compare("READ") == 0) {
                 transType = DATA_READ;
             } else if (cmdStr.compare("WRITE") == 0) {
                 transType = DATA_WRITE;
             } else {
                 ERROR("== Unknown command in tracefile : " << cmdStr);
+                throw std::logic_error("Unknown command in tracefile");
             }
 
             istringstream a(addressStr.substr(2));//gets rid of 0x
@@ -277,6 +277,8 @@ parseTraceFileLine(string &line,
 #endif
         }
         break;
+    default:
+        throw std::domain_error("Bad type");
     }
 
     return dataBuffer;
