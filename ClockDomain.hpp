@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <cmath>
-#include <stdint.h>
+#include <cstdint>
 
 namespace ClockDomain {
 
