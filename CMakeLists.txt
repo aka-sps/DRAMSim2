@@ -56,6 +56,7 @@ add_executable(DRAMSimulator
     ${SRC_FILES}
     ${HEADER_FILES}
 )
+set_target_properties(DRAMSimulator PROPERTIES FOLDER "Exe")
 
 if(DRAMSIM_NO_STORAGE)
     target_compile_definitions(dramsim PUBLIC NO_STORAGE)
@@ -66,6 +67,7 @@ add_executable(dramsim_test
     ${CMAKE_CURRENT_SOURCE_DIR}/example_app/dramsim_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_app/dramsim_test.hpp
 )
+set_target_properties(dramsim_test PROPERTIES FOLDER "Exe")
 
 target_link_libraries(dramsim_test PRIVATE dramsim)
 
