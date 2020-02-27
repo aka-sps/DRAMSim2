@@ -1,4 +1,4 @@
-/** @
+/** @file
 *  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob

@@ -1,5 +1,5 @@
 /** @file
-*  Copyright (c) 2010-2011, Elliott Cooper-Balis
+*  @copyright (c) 2010-2011, Elliott Cooper-Balis
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
