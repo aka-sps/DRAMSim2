@@ -543,11 +543,13 @@ void CommandQueue::print()
 }
 
 /**
- * return a reference to the queue for a given rank, bank. Since we
+ * @return a reference to the queue for a given rank, bank. Since we
  * don't always have a per bank queuing structure, sometimes the bank
  * argument is ignored (and the 0th index is returned
  */
-vector<BusPacket *> &CommandQueue::getCommandQueue(unsigned rank, unsigned bank)
+vector<BusPacket*>&
+CommandQueue::getCommandQueue(unsigned rank,
+                              unsigned bank)
 {
     if (queuingStructure == PerRankPerBank) {
         return queues[rank][bank];
