@@ -30,16 +30,17 @@
 #include "IniReader.hpp"
 
 #include <sstream>
+#include <cassert>
 
 namespace DRAMSim {
 using namespace std;
 
-static bool DEBUG_INI_READER = false;
+static constexpr bool const DEBUG_INI_READER = false;
 
 // Map the string names to the variables they set
 static ConfigMap configMap[] =
 {
-    //DEFINE_UINT_PARAM -- see IniReader.h
+    /// DEFINE_UINT_PARAM -- see IniReader.h
     DEFINE_UINT_PARAM(NUM_BANKS, DEV_PARAM),
     DEFINE_UINT_PARAM(NUM_ROWS, DEV_PARAM),
     DEFINE_UINT_PARAM(NUM_COLS, DEV_PARAM),
@@ -83,12 +84,14 @@ static ConfigMap configMap[] =
     DEFINE_UINT_PARAM(NUM_CHANS, SYS_PARAM),
     DEFINE_UINT_PARAM(JEDEC_DATA_BUS_BITS, SYS_PARAM),
 
-    //Memory Controller related parameters
+    /// Memory Controller related parameters
+    ///@{
     DEFINE_UINT_PARAM(TRANS_QUEUE_DEPTH, SYS_PARAM),
     DEFINE_UINT_PARAM(CMD_QUEUE_DEPTH, SYS_PARAM),
+    ///@}
 
     DEFINE_UINT_PARAM(EPOCH_LENGTH, SYS_PARAM),
-    //Power
+    // Power
     DEFINE_BOOL_PARAM(USE_LOW_POWER, SYS_PARAM),
 
     DEFINE_UINT_PARAM(TOTAL_ROW_ACCESSES, SYS_PARAM),
@@ -110,39 +113,42 @@ static ConfigMap configMap[] =
 };
 
 void
-IniReader::WriteParams(std::ofstream & visDataOut,
+IniReader::WriteParams(std::ofstream &visDataOut,
                        paramType type)
 {
-    for (size_t i = 0; configMap[i].variablePtr != nullptr; ++i) {
+    for (size_t i = 0; configMap[i].variablePtr; ++i) {
         if (configMap[i].parameterType == type) {
             visDataOut << configMap[i].iniKey << "=";
 
             switch (configMap[i].variableType) {
-                //parse and set each type of variable
+                // parse and set each type of variable
             case UINT:
-                visDataOut << *((unsigned *)configMap[i].variablePtr);
+                visDataOut << *static_cast<unsigned *>(configMap[i].variablePtr);
                 break;
 
             case UINT64:
-                visDataOut << *((uint64_t *)configMap[i].variablePtr);
+                visDataOut << *static_cast<uint64_t *>(configMap[i].variablePtr);
                 break;
 
             case FLOAT:
-                visDataOut << *((float *)configMap[i].variablePtr);
+                visDataOut << *static_cast<float *>(configMap[i].variablePtr);
                 break;
 
             case STRING:
-                visDataOut << *((string *)configMap[i].variablePtr);
+                visDataOut << *static_cast<string *>(configMap[i].variablePtr);
                 break;
 
             case BOOL:
-                if (*((bool *)configMap[i].variablePtr)) {
+                if (*static_cast<bool *>(configMap[i].variablePtr)) {
                     visDataOut << "true";
                 } else {
                     visDataOut << "false";
                 }
 
                 break;
+
+            default:
+                assert(0);
             }
 
             visDataOut << endl;
@@ -153,7 +159,9 @@ IniReader::WriteParams(std::ofstream & visDataOut,
         visDataOut << "NUM_RANKS=" << NUM_RANKS << "\n";
     }
 }
-void IniReader::WriteValuesOut(std::ofstream & visDataOut)
+
+void
+IniReader::WriteValuesOut(std::ofstream &visDataOut)
 {
     visDataOut << "!!SYSTEM_INI" << endl;
 
@@ -162,64 +170,76 @@ void IniReader::WriteValuesOut(std::ofstream & visDataOut)
 
     WriteParams(visDataOut, DEV_PARAM);
     visDataOut << "!!EPOCH_DATA" << endl;
-
 }
 
-void IniReader::SetKey(string key, string valueString, bool isSystemParam, size_t lineNumber)
+void
+IniReader::SetKey(string const &key,
+                  string const &valueString,
+                  bool isSystemParam,
+                  size_t lineNumber)
 {
-    size_t i;
-    unsigned intValue;
-    uint64_t int64Value;
-    float floatValue;
+    size_t i = 0;
 
-    for (i = 0; configMap[i].variablePtr != nullptr; i++) {
+    for (; configMap[i].variablePtr; ++i) {
         istringstream iss(valueString);
 
         // match up the string in the config map with the key we parsed
         if (key.compare(configMap[i].iniKey) == 0) {
             switch (configMap[i].variableType) {
-                //parse and set each type of variable
+                // parse and set each type of variable
             case UINT:
-                if ((iss >> dec >> intValue).fail()) {
-                    ERROR("could not parse line " << lineNumber << " (non-numeric value '" << valueString << "')?");
+                {
+                    unsigned intValue;
+                    iss >> dec >> intValue;
+
+                    if (iss.fail()) {
+                        ERROR("could not parse line " << lineNumber << " (non-numeric value '" << valueString << "')?");
+                    }
+
+                    *static_cast<unsigned *>(configMap[i].variablePtr) = intValue;
+
+                    if (DEBUG_INI_READER) {
+                        DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << intValue);
+                    }
                 }
-
-                *((unsigned *)configMap[i].variablePtr) = intValue;
-
-                if (DEBUG_INI_READER) {
-                    DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << intValue);
-                }
-
                 break;
 
             case UINT64:
-                if ((iss >> dec >> int64Value).fail()) {
-                    ERROR("could not parse line " << lineNumber << " (non-numeric value '" << valueString << "')?");
+                {
+                    uint64_t int64Value;
+                    iss >> dec >> int64Value;
+
+                    if (iss.fail()) {
+                        ERROR("could not parse line " << lineNumber << " (non-numeric value '" << valueString << "')?");
+                    }
+
+                    *static_cast<uint64_t *>(configMap[i].variablePtr) = int64Value;
+
+                    if (DEBUG_INI_READER) {
+                        DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << int64Value);
+                    }
                 }
-
-                *((uint64_t *)configMap[i].variablePtr) = int64Value;
-
-                if (DEBUG_INI_READER) {
-                    DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << int64Value);
-                }
-
                 break;
 
             case FLOAT:
-                if ((iss >> dec >> floatValue).fail()) {
-                    ERROR("could not parse line " << lineNumber << " (non-numeric value '" << valueString << "')?");
+                {
+                    float floatValue;
+                    iss >> dec >> floatValue;
+
+                    if (iss.fail()) {
+                        ERROR("could not parse line " << lineNumber << " (non-numeric value '" << valueString << "')?");
+                    }
+
+                    *static_cast<float *>(configMap[i].variablePtr) = floatValue;
+
+                    if (DEBUG_INI_READER) {
+                        DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << floatValue);
+                    }
                 }
-
-                *((float *)configMap[i].variablePtr) = floatValue;
-
-                if (DEBUG_INI_READER) {
-                    DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << floatValue);
-                }
-
                 break;
 
             case STRING:
-                *((string *)configMap[i].variablePtr) = string(valueString);
+                *static_cast<string *>(configMap[i].variablePtr) = string(valueString);
 
                 if (DEBUG_INI_READER) {
                     DEBUG("\t - SETTING " << configMap[i].iniKey << "=" << valueString);
@@ -228,11 +248,8 @@ void IniReader::SetKey(string key, string valueString, bool isSystemParam, size_
                 break;
 
             case BOOL:
-                if (valueString == "true" || valueString == "1") {
-                    *((bool *)configMap[i].variablePtr) = true;
-                } else {
-                    *((bool *)configMap[i].variablePtr) = false;
-                }
+                *static_cast<bool *>(configMap[i].variablePtr) = valueString == "true" || valueString == "1";
+                break;
             }
 
             // lineNumber == 0 implies that this is an override parameter from the command line, so don't bother doing these checks
@@ -251,82 +268,89 @@ void IniReader::SetKey(string key, string valueString, bool isSystemParam, size_
         }
     }
 
-    if (configMap[i].variablePtr == nullptr) {
+    if (!configMap[i].variablePtr) {
         DEBUG("WARNING: UNKNOWN KEY '" << key << "' IN INI FILE");
     }
 }
 
 void
-IniReader::ReadIniFile(string filename,
+IniReader::ReadIniFile(string const &filename,
                        bool isSystemFile)
 {
-    ifstream iniFile;
-    string line;
-    string key, valueString;
 
-    size_t commentIndex, equalsIndex;
+    ifstream iniFile(filename);
+
+    if (!iniFile.is_open()) {
+        throw std::logic_error(std::string("Unable to load ini file ") + filename);
+    }
+
     size_t lineNumber = 0;
 
-    iniFile.open(filename.c_str());
+    while (!iniFile.eof()) {
+        ++lineNumber;
+        string line;
+        getline(iniFile, line);
 
-    if (iniFile.is_open()) {
-        while (!iniFile.eof()) {
-            lineNumber++;
-            getline(iniFile, line);
+        // this can happen if the filename is actually a directory
+        if (iniFile.bad()) {
+            ERROR("Cannot read ini file '" << filename << "'");
+            throw std::logic_error("Cannot read ini file");
+        }
 
-            //this can happen if the filename is actually a directory
-            if (iniFile.bad()) {
-                ERROR("Cannot read ini file '" << filename << "'");
-                throw std::logic_error("Cannot read ini file");
-            }
+        // skip zero-length lines
+        if (line.size() == 0) {
+            //                  DEBUG("Skipping blank line "<<lineNumber);
+            continue;
+        }
 
-            // skip zero-length lines
-            if (line.size() == 0) {
-                //                  DEBUG("Skipping blank line "<<lineNumber);
-                continue;
-            }
+        {
+            // search for a comment char
+            size_t commentIndex = line.find_first_of(";");
 
-            //search for a comment char
-            if ((commentIndex = line.find_first_of(";")) != string::npos) {
-                //if the comment char is the first char, ignore the whole line
+            if (commentIndex != string::npos) {
+                // if the comment char is the first char, ignore the whole line
                 if (commentIndex == 0) {
                     //                      DEBUG("Skipping comment line "<<lineNumber);
                     continue;
                 }
 
                 //                  DEBUG("Truncating line at comment"<<line[commentIndex-1]);
-                //truncate the line at first comment before going on
+                // truncate the line at first comment before going on
                 line = line.substr(0, commentIndex);
             }
+        }
 
+        {
             // trim off the end spaces that might have been between the value and comment char
             size_t whiteSpaceEndIndex;
 
             if ((whiteSpaceEndIndex = line.find_last_not_of(" \t")) != string::npos) {
                 line = line.substr(0, whiteSpaceEndIndex + 1);
             }
+        }
 
-            // at this point line should be a valid, commentless string
+        // at this point line should be a valid, commentless string
 
+        {
             // a line has to have an equals sign
+            size_t equalsIndex;
+
             if ((equalsIndex = line.find_first_of("=")) == string::npos) {
                 throw std::logic_error(std::string("Malformed Line ") + std::to_string(lineNumber) + " (missing equals)");
             }
 
-            size_t strlen = line.size();
+            auto const strlen = line.size();
             // all characters before the equals are the key
-            key = line.substr(0, equalsIndex);
+            auto const key = line.substr(0, equalsIndex);
             // all characters after the equals are the value
-            valueString = line.substr(equalsIndex + 1, strlen - equalsIndex);
+            auto const valueString = line.substr(equalsIndex + 1, strlen - equalsIndex);
 
             IniReader::SetKey(key, valueString, isSystemFile, lineNumber);
-            // got to the end of the config map without finding the key
         }
-    } else {
-        throw std::logic_error(std::string("Unable to load ini file ") + filename);
+        // got to the end of the config map without finding the key
     }
 
-    /* precompute frequently used values */
+    /** precompute frequently used values */
     NUM_BANKS_LOG = dramsim_log2(NUM_BANKS);
     NUM_CHANS_LOG = dramsim_log2(NUM_CHANS);
     NUM_ROWS_LOG = dramsim_log2(NUM_ROWS);
@@ -344,12 +368,11 @@ IniReader::OverrideKeys(OverrideMap const *const map)
         return;
     }
 
-    OverrideIterator it = map->begin();
     DEBUG("Key overrides from command line:");
 
-    for (it = map->begin(); it != map->end(); it++) {
-        string key = it->first;
-        string value = it->second;
+    for (auto const &it: *map) {
+        auto const &key = it.first;
+        auto const &value = it.second;
         DEBUG("\t'" << key << "'->'" << value << "'");
         IniReader::SetKey(key, value);
     }
@@ -359,12 +382,12 @@ bool
 IniReader::CheckIfAllSet(void)
 {
     // check to make sure all parameters that we expected were set
-    for (size_t i = 0; configMap[i].variablePtr != nullptr; i++) {
+    for (size_t i = 0; configMap[i].variablePtr; ++i) {
         if (!configMap[i].wasSet) {
             DEBUG("WARNING: KEY " << configMap[i].iniKey << " NOT FOUND IN INI FILE.");
 
             switch (configMap[i].variableType) {
-                //the string and bool values can be defaulted, but generally we need all the numeric values to be set to continue
+                // the string and bool values can be defaulted, but generally we need all the numeric values to be set to continue
             case UINT:
             case UINT64:
             case FLOAT:
@@ -386,11 +409,11 @@ IniReader::CheckIfAllSet(void)
     return true;
 }
 
-/*
+/**
  * There is probably a way of doing this with templates, but since
  * we have the types defined as an enum, doing this with macros is trivial.
  *
- * Return value: 0 on success, -1 on error
+ * @return value: 0 on success, -1 on error
  */
 #define DEF_GETTER(_funcname, _type, _typename)             \
     int _funcname(const std::string& field, _type *val)     \
@@ -409,13 +432,14 @@ IniReader::CheckIfAllSet(void)
         return -1;                      \
     }
 
- /* TODO: getter for strings is missing. Probably not that useful though */
+/** @todo getter for strings is missing. Probably not that useful though */
 DEF_GETTER(IniReader::getBool, bool, BOOL)
 DEF_GETTER(IniReader::getUint, unsigned int, UINT)
 DEF_GETTER(IniReader::getUint64, uint64_t, UINT64)
 DEF_GETTER(IniReader::getFloat, float, FLOAT)
 
-void IniReader::InitEnumsFromStrings()
+void
+IniReader::InitEnumsFromStrings(void)
 {
     if (ADDRESS_MAPPING_SCHEME == "scheme1") {
         addressMappingScheme = Scheme1;
@@ -514,7 +538,6 @@ void IniReader::InitEnumsFromStrings()
         cout << "WARNING: Unknown scheduling policy '" << SCHEDULING_POLICY << "'; valid options are 'rank_then_bank_round_robin' or 'bank_then_rank_round_robin'; defaulting to Bank Then Rank Round Robin" << endl;
         schedulingPolicy = BankThenRankRoundRobin;
     }
-
 }
 
 } // namespace DRAMSim

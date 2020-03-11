@@ -74,14 +74,14 @@ public:
     typedef std::map<std::string, std::string> OverrideMap;
     typedef OverrideMap::const_iterator OverrideIterator;
 
-    static void SetKey(std::string key,
-                       std::string value,
+    static void SetKey(std::string const &key,
+                       std::string const &value,
                        bool isSystemParam = false,
                        size_t lineNumber = 0);
     static void
         OverrideKeys(const OverrideMap *map);
     static void
-        ReadIniFile(std::string filename,
+        ReadIniFile(std::string const &filename,
                     bool isSystemParam);
     static void
         InitEnumsFromStrings(void);
