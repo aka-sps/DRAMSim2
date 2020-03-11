@@ -29,22 +29,21 @@ ClockDomainCrosser::ClockDomainCrosser(double ratio, ClockUpdateCB *_callback)
     // Compute numerator and denominator for ratio, then pass that to other constructor.
     double x = ratio;
 
-    const int MAX_ITER = 15;
-    unsigned ns[MAX_ITER], ds[MAX_ITER];
+    auto const MAX_ITER = 15;
+    unsigned ns[MAX_ITER];
+    unsigned ds[MAX_ITER] = {0, 1};
     double zs[MAX_ITER];
-    ds[0] = 0;
-    ds[1] = 1;
     zs[1] = x;
     ns[1] = static_cast<int>(x);
 
     size_t i;
-    for (i = 1; i < MAX_ITER - 1; i++) {
-        if (fabs(x - (double)ns[i] / (double)ds[i]) < 0.00005) {
+
+    for (i = 1; i < MAX_ITER - 1; ++i) {
+        if (fabs(x - double(ns[i]) / double(ds[i])) < 0.00005) {
             break;
         }
-        //TODO: or, if the answers are the same as the last iteration, stop 
-
-        zs[i + 1] = 1.0f / (zs[i] - (int)floor(zs[i])); // 1/(fractional part of z_i)
+        /// @todo or, if the answers are the same as the last iteration, stop 
+        zs[i + 1] = 1.0f / (zs[i] - (int)floor(zs[i]));  // 1/(fractional part of z_i)
         ds[i + 1] = ds[i] * (int)floor(zs[i + 1]) + ds[i - 1];
         double const tmp = x*ds[i + 1];
         /// @todo fprem
@@ -59,25 +58,26 @@ ClockDomainCrosser::ClockDomainCrosser(double ratio, ClockUpdateCB *_callback)
 void
 ClockDomainCrosser::update(void)
 {
-    //short circuit case for 1:1 ratios
-    if (clock1 == clock2 && callback) {
+    // short circuit case for 1:1 ratios
+    if (this->clock1 == this->clock2 && this->callback) {
         (*callback)();
         return;
     }
 
     // Update counter 1.
-    counter1 += clock1;
+    this->counter1 += this->clock1;
 
-    while (counter2 < counter1) {
-        counter2 += clock2;
+    while (this->counter2 < this->counter1) {
+        this->counter2 += this->clock2;
+
         if (callback) {
             (*callback)();
         }
     }
 
-    if (counter1 == counter2) {
-        counter1 = 0;
-        counter2 = 0;
+    if (this->counter1 == this->counter2) {
+        this->counter1 = 0;
+        this->counter2 = 0;
     }
 }
 
@@ -90,7 +90,7 @@ TestObj::cb(void)
 int
 TestObj::test(void)
 {
-    ClockUpdateCB *callback = new Callback<TestObj, void>(this, &TestObj::cb);
+    auto const callback = new Callback<TestObj, void>(this, &TestObj::cb);
 
     ClockDomainCrosser x(0.5, callback);
     cout << "------------------------------------------\n";
@@ -99,9 +99,7 @@ TestObj::test(void)
     ClockDomainCrosser z(0.9, callback);
     cout << "------------------------------------------\n";
 
-
-    for (int i = 0; i < 10; i++) {
-
+    for (auto i = 0u; i < 10u; ++i) {
         x.update();
         cout << "UPDATE: counter1= " << x.counter1 << "; counter2= " << x.counter2 << "; " << endl;
     }
