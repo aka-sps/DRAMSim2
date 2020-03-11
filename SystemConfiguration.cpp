@@ -53,20 +53,22 @@ unsigned tXP;
 unsigned tCMD;
 unsigned NUM_DEVICES;
 
-//in bytes
+/// in bytes
 unsigned JEDEC_DATA_BUS_BITS;
 
-//Memory Controller related parameters
+/// Memory Controller related parameters
+///@{
 unsigned TRANS_QUEUE_DEPTH;
 unsigned CMD_QUEUE_DEPTH;
+///@}
 
-//cycles within an epoch
+/// cycles within an epoch
 unsigned EPOCH_LENGTH;
 
-//row accesses allowed before closing (open page)
+/// row accesses allowed before closing (open page)
 unsigned TOTAL_ROW_ACCESSES;
 
-// strings and their associated enums
+/// strings and their associated enums
 std::string ROW_BUFFER_POLICY;
 std::string SCHEDULING_POLICY;
 std::string ADDRESS_MAPPING_SCHEME;

@@ -35,10 +35,6 @@
 #include <fstream>
 #include <string>
 
-//#ifdef __APPLE__
-//#include <sys/types.h>
-//#endif
-
 #define RL (CL+AL)
 #define WL (RL-1)
 
