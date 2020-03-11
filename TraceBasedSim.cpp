@@ -170,10 +170,10 @@ parseTraceFileLine(string &line,
                 throw std::logic_error("Unknown Command");
             }
 
-            istringstream a(addressStr.substr(2));//gets rid of 0x
+            istringstream a(addressStr.substr(2));  // gets rid of 0x
             a >> hex >> addr;
 
-            //if this is set to false, clockCycle will remain at 0, and every line read from the trace
+            // if this is set to false, clockCycle will remain at 0, and every line read from the trace
             //  will be allowed to be issued
             if (useClockCycle) {
                 istringstream b(ccStr);
