@@ -35,6 +35,7 @@
 #include <cstdint>
 
 /// @defgroup DRAMSim DDR emulation
+/// @ingroup mem_sim memory
 ///@{
 namespace DRAMSim {
 enum BusPacketType
