@@ -85,19 +85,19 @@ private:
                         unsigned &bank);
 
 private:
-    unsigned nextBank;
-    unsigned nextRank;
+    unsigned nextBank = 0;
+    unsigned nextRank = 0;
 
-    unsigned nextBankPRE;
-    unsigned nextRankPRE;
+    unsigned nextBankPRE = 0;
+    unsigned nextRankPRE = 0;
 
-    unsigned refreshRank;
-    bool refreshWaiting;
+    unsigned refreshRank = 0;
+    bool refreshWaiting = false;
 
     std::vector<std::vector<unsigned>> tFAWCountdown;
     std::vector<std::vector<unsigned>> rowAccessCounters;
 
-    bool sendAct;
+    bool sendAct = true;
 };
 }  // namespace DRAMSim
 
