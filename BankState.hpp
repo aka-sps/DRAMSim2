@@ -48,16 +48,16 @@ public:
         PowerDown
     };
 
-    CurrentBankState currentBankState;
-    unsigned openRowAddress;
-    uint64_t nextRead;
-    uint64_t nextWrite;
-    uint64_t nextActivate;
-    uint64_t nextPrecharge;
-    uint64_t nextPowerUp;
+    CurrentBankState currentBankState = Idle;
+    unsigned openRowAddress = 0;
+    uint64_t nextRead = 0;
+    uint64_t nextWrite = 0;
+    uint64_t nextActivate = 0;
+    uint64_t nextPrecharge = 0;
+    uint64_t nextPowerUp = 0;
 
-    BusPacketType lastCommand;
-    unsigned stateChangeCountdown;
+    BusPacketType lastCommand = READ;
+    unsigned stateChangeCountdown = 0;
 
     BankState(std::ostream &dramsim_log_);
 

@@ -36,21 +36,13 @@
 namespace DRAMSim {
 using namespace std;
 
-//All banks start precharged
+/// All banks start precharged
 BankState::BankState(ostream &dramsim_log_) :
-    dramsim_log(dramsim_log_),
-    currentBankState(Idle),
-    openRowAddress(0),
-    nextRead(0),
-    nextWrite(0),
-    nextActivate(0),
-    nextPrecharge(0),
-    nextPowerUp(0),
-    lastCommand(READ),
-    stateChangeCountdown(0)
+    dramsim_log(dramsim_log_)
 {}
 
-void BankState::print()
+void
+BankState::print(void)
 {
     PRINT(" == Bank State ");
     if (currentBankState == Idle) {
