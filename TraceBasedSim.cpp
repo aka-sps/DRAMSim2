@@ -43,7 +43,7 @@ using namespace std;
 //#define RETURN_TRANSACTIONS 1
 
 #ifndef _SIM_
-ofstream visDataOut; //mostly used in MemoryController
+ofstream visDataOut;  ///< mostly used in MemoryController
 
 #ifdef RETURN_TRANSACTIONS
 class TransactionReceiver
@@ -208,7 +208,7 @@ parseTraceFileLine(string &line,
             istringstream a(addressStr.substr(2));//gets rid of 0x
             a >> hex >> addr;
 
-            //if this is set to false, clockCycle will remain at 0, and every line read from the trace
+            // if this is set to false, clockCycle will remain at 0, and every line read from the trace
             //  will be allowed to be issued
             if (useClockCycle) {
                 istringstream b(ccStr);
@@ -235,8 +235,8 @@ parseTraceFileLine(string &line,
                 dataStr = line.substr(spaceIndex + 1);
             }
 
-            //convert address string -> number
-            istringstream b(addressStr.substr(2)); //substr(2) chops off 0x characters
+            // convert address string -> number
+            istringstream b(addressStr.substr(2));  // substr(2) chops off 0x characters
             b >> hex >> addr;
 
             // parse command
@@ -249,11 +249,11 @@ parseTraceFileLine(string &line,
                 throw std::logic_error("INVALID COMMAND");
             }
             if (SHOW_SIM_OUTPUT) {
-                DEBUGN("ADDR='" << hex << addr << dec << "',CMD='" << transType << "'");//',DATA='"<<dataBuffer[0]<<"'");
+                DEBUGN("ADDR='" << hex << addr << dec << "',CMD='" << transType << "'");
             }
 
-            //parse data
-            //if we are running in a no storage mode, don't allocate space, just return nullptr
+            // parse data
+            // if we are running in a no storage mode, don't allocate space, just return nullptr
 #ifndef NO_STORAGE
             if (dataStr.size() > 0 && transType == DATA_WRITE) {
                 // 32 bytes of data per transaction
@@ -350,7 +350,8 @@ main(int argc, char **argv)
     IniReader::OverrideMap *paramOverrides = nullptr;
 
     unsigned numCycles = 1000;
-    //getopt stuff
+
+    // getopt stuff
     for (;;) {
         static struct option long_options[] =
         {
@@ -367,61 +368,79 @@ main(int argc, char **argv)
                 {"visfile", required_argument, 0, 'v'},
                 {0, 0, 0, 0}
         };
-        int option_index = 0; //for getopt
+
+        int option_index = 0;  // for getopt
         c = getopt_long(argc, argv, "t:s:c:d:o:p:S:v:qn", long_options, &option_index);
         if (c == -1) {
             break;
         }
         switch (c) {
-        case 0: //TODO: figure out what the hell this does, cuz it never seems to get called
-            if (long_options[option_index].flag != 0) //do nothing on a flag
-            {
+        case 0:
+            /// @tod: figure out what the hell this does, cuz it never seems to get called
+            if (long_options[option_index].flag != 0) {
+                // do nothing on a flag
                 printf("setting flag\n");
                 break;
             }
+
             printf("option %s", long_options[option_index].name);
+
             if (optarg) {
                 printf(" with arg %s", optarg);
             }
+
             printf("\n");
             break;
+
         case 'h':
             usage();
             return 0;
-            break;
+
         case 't':
             traceFileName = string(optarg);
             break;
+
         case 's':
             systemIniFilename = string(optarg);
             break;
+
         case 'd':
             deviceIniFilename = string(optarg);
             break;
+
         case 'c':
             numCycles = atoi(optarg);
             break;
+
         case 'S':
             megsOfMemory = atoi(optarg);
             break;
+
         case 'p':
             pwdString = string(optarg);
             break;
+
         case 'q':
             SHOW_SIM_OUTPUT = false;
             break;
+
         case 'n':
             useClockCycle = false;
             break;
+
         case 'o':
             paramOverrides = parseParamOverrides(string(optarg));
             break;
+
         case 'v':
             visFilename = new string(optarg);
             break;
+
         case '?':
             usage();
             throw std::logic_error("usage");
+
+        default:
             break;
         }
     }
@@ -429,8 +448,9 @@ main(int argc, char **argv)
     // get the trace filename
     string temp = traceFileName.substr(traceFileName.find_last_of("/") + 1);
 
-    //get the prefix of the trace name
+    // get the prefix of the trace name
     temp = temp.substr(0, temp.find_first_of("_"));
+
     if (temp == "mase") {
         traceType = mase;
     } else if (temp == "k6") {
@@ -451,18 +471,16 @@ main(int argc, char **argv)
     }
 
 
-    //ignore the pwd argument if the argument is an absolute path
+    // ignore the pwd argument if the argument is an absolute path
     if (pwdString.length() > 0 && traceFileName[0] != '/') {
         traceFileName = pwdString + "/" + traceFileName;
     }
 
     DEBUG("== Loading trace file '" << traceFileName << "' == ");
 
-    ifstream traceFile;
     string line;
 
-
-    MultiChannelMemorySystem *memorySystem = new MultiChannelMemorySystem(deviceIniFilename, systemIniFilename, pwdString, traceFileName, megsOfMemory, visFilename, paramOverrides);
+    auto const memorySystem = new MultiChannelMemorySystem(deviceIniFilename, systemIniFilename, pwdString, traceFileName, megsOfMemory, visFilename, paramOverrides);
     // set the frequency ratio to 1:1
     memorySystem->setCPUClockSpeed(0);
 
@@ -488,14 +506,14 @@ main(int argc, char **argv)
     Transaction *trans = nullptr;
     bool pendingTrans = false;
 
-    traceFile.open(traceFileName.c_str());
+    ifstream traceFile(traceFileName);
 
     if (!traceFile.is_open()) {
         cout << "== Error - Could not open trace file" << endl;
         throw std::logic_error("Could not open trace file");
     }
 
-    for (size_t i = 0; i < numCycles; i++) {
+    for (size_t i = 0; i < numCycles; ++i) {
         if (!pendingTrans) {
             if (!traceFile.eof()) {
                 getline(traceFile, line);
@@ -521,9 +539,10 @@ main(int argc, char **argv)
                 } else {
                     DEBUG("WARNING: Skipping line " << lineNumber << " ('" << line << "') in tracefile");
                 }
-                lineNumber++;
+
+                ++lineNumber;
             } else {
-                //we're out of trace, set pending=false and let the thing spin without adding transactions
+                // we're out of trace, set pending=false and let the thing spin without adding transactions
                 pendingTrans = false;
             }
         } else if (pendingTrans && i >= clockCycle) {
@@ -541,10 +560,12 @@ main(int argc, char **argv)
 
     traceFile.close();
     memorySystem->printStats(true);
+
     // make valgrind happy
     if (trans) {
         delete trans;
     }
+
     delete(memorySystem);
 }
 
