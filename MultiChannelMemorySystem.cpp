@@ -69,7 +69,7 @@ MultiChannelMemorySystem::MultiChannelMemorySystem(const string &deviceIniFilena
     }
 
     if (pwd.length() > 0) {
-        //ignore the pwd argument if the argument is an absolute path
+        // ignore the pwd argument if the argument is an absolute path
         if (this->deviceIniFilename[0] != '/') {
             this->deviceIniFilename = pwd + "/" + deviceIniFilename;
         }
@@ -274,7 +274,7 @@ MultiChannelMemorySystem::InitOutputFiles(string traceFilename)
             throw std::runtime_error("Cannot open");
         }
 
-        //write out the ini config values for the visualizer tool
+        // write out the ini config values for the visualizer tool
         IniReader::WriteValuesOut(visDataOut);
     }
 
