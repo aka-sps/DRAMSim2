@@ -48,8 +48,8 @@
 #define READ_TO_WRITE_DELAY (RL+BL/2+tRTRS-WL)
 #define READ_AUTOPRE_DELAY (AL+tRTP+tRP)
 #define WRITE_AUTOPRE_DELAY (WL+BL/2+tWR+tRP)
-#define WRITE_TO_READ_DELAY_B (WL+BL/2+tWTR) //interbank
-#define WRITE_TO_READ_DELAY_R (WL+BL/2+tRTRS-RL) //interrank
+#define WRITE_TO_READ_DELAY_B (WL+BL/2+tWTR)  ///< interbank
+#define WRITE_TO_READ_DELAY_R (WL+BL/2+tRTRS-RL)  ///< interrank
 
 namespace DRAMSim {
 enum TraceType
@@ -97,10 +97,12 @@ typedef void(*powerCallBack_t)(double bgpower, double burstpower, double refresh
 // @todo move to system ini file
 static constexpr auto const HISTOGRAM_BIN_SIZE = 10;
 
-extern std::ofstream cmd_verify_out; //used by BusPacket.cpp if VERIFICATION_OUTPUT is enabled
-//extern std::ofstream visDataOut;
+extern std::ofstream cmd_verify_out;  ///< used by BusPacket.cpp if VERIFICATION_OUTPUT is enabled
+#if 0
+extern std::ofstream visDataOut;
+#endif
 
-extern bool VERIFICATION_OUTPUT; // output suitable to feed to modelsim
+extern bool VERIFICATION_OUTPUT;  ///< output suitable to feed to modelsim
 
 extern bool DEBUG_TRANS_Q;
 extern bool DEBUG_CMD_Q;
@@ -159,7 +161,9 @@ extern unsigned NUM_DEVICES;
 
 extern unsigned JEDEC_DATA_BUS_BITS;
 
-//Memory Controller related parameters
+/// Memory Controller related parameters
+/// @todo use struct
+///@{
 extern unsigned TRANS_QUEUE_DEPTH;
 extern unsigned CMD_QUEUE_DEPTH;
 
@@ -176,8 +180,10 @@ extern RowBufferPolicy rowBufferPolicy;
 extern SchedulingPolicy schedulingPolicy;
 extern AddressMappingScheme addressMappingScheme;
 extern QueuingStructure queuingStructure;
+///@}
 
 /** Power computations are localized to MemoryController.cpp */
+///@{
 extern unsigned IDD0;
 extern unsigned IDD1;
 extern unsigned IDD2P;
@@ -193,6 +199,7 @@ extern unsigned IDD6;
 extern unsigned IDD6L;
 extern unsigned IDD7;
 extern float Vdd;
+///@}
 
 static inline unsigned
 dramsim_log2(unsigned value)
@@ -200,10 +207,12 @@ dramsim_log2(unsigned value)
     unsigned logbase2 = 0;
     unsigned const orig = value;
     value >>= 1;
+
     while (value > 0) {
         value >>= 1;
-        logbase2++;
+        ++logbase2;
     }
+
     if (1u << logbase2 < orig) {
         ++logbase2;
     }
