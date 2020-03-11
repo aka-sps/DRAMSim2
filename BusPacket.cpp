@@ -85,7 +85,7 @@ BusPacket::print(uint64_t currentClockCycle,
         cmd_verify_out << currentClockCycle << ": refresh (" << rank << ");" << endl;
         break;
     case DATA:
-        //TODO: data verification?
+        /// @todo data verification?
         break;
     default:
         throw std::logic_error("Trying to print unknown kind of bus packet");
