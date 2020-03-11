@@ -89,9 +89,9 @@ addressMapping(uint64_t physicalAddress,
                         << " Total:" << (channelBitWidth + rankBitWidth + bankBitWidth + rowBitWidth + colLowBitWidth + colHighBitWidth + byteOffsetWidth));
     }
 
-    //perform various address mapping schemes
+    // perform various address mapping schemes
     if (addressMappingScheme == Scheme1) {
-        //chan:rank:row:col:bank
+        // chan:rank:row:col:bank
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= bankBitWidth;
@@ -128,7 +128,7 @@ addressMapping(uint64_t physicalAddress,
         }
 
     } else if (addressMappingScheme == Scheme2) {
-        //chan:row:col:bank:rank
+        // chan:row:col:bank:rank
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= rankBitWidth;
@@ -165,7 +165,7 @@ addressMapping(uint64_t physicalAddress,
         }
 
     } else if (addressMappingScheme == Scheme3) {
-        //chan:rank:bank:col:row
+        // chan:rank:bank:col:row
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= rowBitWidth;
@@ -202,7 +202,7 @@ addressMapping(uint64_t physicalAddress,
         }
 
     } else if (addressMappingScheme == Scheme4) {
-        //chan:rank:bank:row:col
+        // chan:rank:bank:row:col
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= colHighBitWidth;
@@ -239,8 +239,7 @@ addressMapping(uint64_t physicalAddress,
         }
 
     } else if (addressMappingScheme == Scheme5) {
-        //chan:row:col:rank:bank
-
+        // chan:row:col:rank:bank
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= bankBitWidth;
@@ -278,8 +277,7 @@ addressMapping(uint64_t physicalAddress,
 
 
     } else if (addressMappingScheme == Scheme6) {
-        //chan:row:bank:rank:col
-
+        // chan:row:bank:rank:col
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= colHighBitWidth;
@@ -316,7 +314,7 @@ addressMapping(uint64_t physicalAddress,
         }
     } else if (addressMappingScheme == Scheme7) {
         // clone of scheme 5, but channel moved to lower bits
-        //row:col:rank:bank:chan
+        // row:col:rank:bank:chan
         {
             auto const tempA = physicalAddress;
             physicalAddress >>= channelBitWidth;
