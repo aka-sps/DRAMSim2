@@ -98,7 +98,7 @@ public:
     void
         setCPUClockSpeed(uint64_t cpuClkFreqHz);
 
-    //output file
+    // output file
     std::ofstream visDataOut;
     std::ofstream dramsim_log;
 
