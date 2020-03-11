@@ -55,7 +55,7 @@ public:
     bool
         addTransaction(Transaction *trans);
     bool
-        WillAcceptTransaction(void);
+        WillAcceptTransaction(void)const;
     void
         returnReadData(const Transaction *trans);
     void
@@ -72,34 +72,33 @@ public:
     std::vector<Transaction *> transactionQueue;
 
 private:
-    std::ostream &dramsim_log;
-    std::vector<std::vector<BankState> > bankStates;
     void
         insertHistogram(unsigned latencyValue,
                         unsigned rank,
                         unsigned bank);
 
     MemorySystem *parentMemorySystem;
+    std::ostream &dramsim_log;
+    std::vector<std::vector<BankState> > bankStates;
     CommandQueue commandQueue;
-    BusPacket *poppedBusPacket;
+    CSVWriter &csvOut;
+    std::vector<bool> powerDown;
+    BusPacket *poppedBusPacket = nullptr;
     std::vector<unsigned>refreshCountdown;
     std::vector<BusPacket *> writeDataToSend;
     std::vector<unsigned> writeDataCountdown;
     std::vector<Transaction *> returnTransaction;
     std::vector<Transaction *> pendingReadTransactions;
     std::map<unsigned, unsigned> latencies;  ///< latencyValue -> latencyCount
-    std::vector<bool> powerDown;
-    std::vector<Rank *> *ranks;
-
-    CSVWriter &csvOut;
+    std::vector<Rank *> *ranks = nullptr;
 
     // these packets are counting down waiting to be transmitted on the "bus"
-    BusPacket *outgoingCmdPacket;
-    unsigned cmdCyclesLeft;
-    BusPacket *outgoingDataPacket;
-    unsigned dataCyclesLeft;
+    BusPacket *outgoingCmdPacket = nullptr;
+    unsigned cmdCyclesLeft = 0;
+    BusPacket *outgoingDataPacket = nullptr;
+    unsigned dataCyclesLeft = 0;
 
-    uint64_t totalTransactions;
+    uint64_t totalTransactions = 0;
     std::vector<uint64_t> grandTotalBankAccesses;
     std::vector<uint64_t> totalReadsPerBank;
     std::vector<uint64_t> totalWritesPerBank;
@@ -107,13 +106,15 @@ private:
     std::vector<uint64_t> totalWritesPerRank;
     std::vector< uint64_t > totalEpochLatency;
 
+#if 0
     unsigned channelBitWidth;
     unsigned rankBitWidth;
     unsigned bankBitWidth;
     unsigned rowBitWidth;
     unsigned colBitWidth;
     unsigned byteOffsetWidth;
-    unsigned refreshRank;
+#endif
+    unsigned refreshRank = 0;
 
 public:
     // energy values are per rank -- SST uses these directly, so make these public 
