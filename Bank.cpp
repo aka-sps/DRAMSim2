@@ -41,7 +41,7 @@ Bank::Bank(ostream &dramsim_log_)
     , dramsim_log(dramsim_log_)
 {}
 
-/* The bank class is just a glorified sparse storage data structure
+/** The bank class is just a glorified sparse storage data structure
  * that keeps track of written data in case the simulator wants a
  * function DRAM model
  *
@@ -54,30 +54,29 @@ Bank::Bank(ostream &dramsim_log_)
  * read() searches for a node with the right row value, if not found
  * 	returns the tracer value 0xDEADBEEF
  *
- *	TODO: if anyone wants to actually store data, see the 'data_storage' branch and perhaps try to merge that into master
+ * @todo if anyone wants to actually store data, see the 'data_storage' branch and perhaps try to merge that into master
+ * @todo use std
+ * @bug this is a DataStruct list method rather than Bank method
  */
-
-
-
-Bank::DataStruct *Bank::searchForRow(unsigned row, DataStruct *head)
+Bank::DataStruct *
+Bank::searchForRow(unsigned const row,
+                   DataStruct *head)
 {
-    while (head != nullptr) {
+    /// @todo use std::find
+    for (; head; head = head->next) {
         if (head->row == row) {
-            //found it
-            return head;
+            break;
         }
-        //keep looking
-        head = head->next;
     }
-    //if we get here, didn't find it
-    return nullptr;
+
+    return head;
 }
 
 void
 Bank::read(BusPacket *const busPacket)
 {
-    DataStruct *const rowHeadNode = rowEntries[busPacket->column];
-    DataStruct *const foundNode = Bank::searchForRow(busPacket->row, rowHeadNode);
+    auto const rowHeadNode = this->rowEntries[busPacket->column];
+    auto const foundNode = Bank::searchForRow(busPacket->row, rowHeadNode);
 
     if (!foundNode) {
         // the row hasn't been written before, so it isn't in the list
@@ -96,10 +95,10 @@ Bank::read(BusPacket *const busPacket)
 }
 
 void
-Bank::write(const BusPacket *busPacket)
+Bank::write(const BusPacket *const busPacket)
 {
-    //TODO: move all the error checking to BusPacket so once we have a bus packet,
-    //			we know the fields are all legal
+    /// @todo move all the error checking to BusPacket so once we have a bus packet,
+    ///			we know the fields are all legal
 
     if (busPacket->column >= NUM_COLS) {
         ERROR("== Error - Bus Packet column " << busPacket->column << " out of bounds");
@@ -107,15 +106,15 @@ Bank::write(const BusPacket *busPacket)
     }
 
     // head of the list we need to search
-    DataStruct *rowHeadNode = rowEntries[busPacket->column];
-    DataStruct *foundNode = nullptr;
+    auto const rowHeadNode = rowEntries[busPacket->column];
+    auto const foundNode = Bank::searchForRow(busPacket->row, rowHeadNode);
 
-    if ((foundNode = Bank::searchForRow(busPacket->row, rowHeadNode)) == nullptr) {
-        //not found
-        DataStruct *newRowNode = (DataStruct *)malloc(sizeof(DataStruct));
+    if (!foundNode) {
+        // not found
+        auto const newRowNode = new DataStruct;
 
-        //insert at the head for speed
-        //TODO: Optimize this data structure for speedier lookups?
+        /// insert at the head for speed
+        /// @todo Optimize this data structure for speedier lookups?
         newRowNode->row = busPacket->row;
         newRowNode->data = busPacket->data;
         newRowNode->next = rowHeadNode;
@@ -123,6 +122,7 @@ Bank::write(const BusPacket *busPacket)
     } else {
         // found it, just plaster in the new data
         foundNode->data = busPacket->data;
+
         if (DEBUG_BANKS) {
             PRINTN(" -- Bank " << busPacket->bank << " writing to physical address 0x" << hex << busPacket->physicalAddress << dec << ":");
             busPacket->printData();
