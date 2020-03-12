@@ -52,9 +52,9 @@ public:
                  CSVWriter &csvOut_,
                  std::ostream &dramsim_log_);
     virtual
-        ~MemorySystem();
+        ~MemorySystem(void);
     void
-        update();
+        update(void);
     bool
         addTransaction(Transaction *trans);
     bool

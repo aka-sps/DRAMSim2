@@ -9,7 +9,7 @@ template <typename ReturnT>
 class CallbackBase
 {
 public:
-    virtual ReturnT operator()() = 0;
+    virtual ReturnT operator()(void) = 0;
 };
 
 template <typename ConsumerT, typename ReturnT>
@@ -17,7 +17,7 @@ class Callback
     : public CallbackBase<ReturnT>
 {
 private:
-    typedef ReturnT(ConsumerT::*PtrMember)();
+    typedef ReturnT(ConsumerT::*PtrMember)(void);
 
 public:
     Callback(ConsumerT* const object, PtrMember member)
@@ -52,7 +52,7 @@ public:
     ClockDomainCrosser(ClockUpdateCB *_callback);
     ClockDomainCrosser(uint64_t _clock1, uint64_t _clock2, ClockUpdateCB *_callback);
     ClockDomainCrosser(double ratio, ClockUpdateCB *_callback);
-    void update();
+    void update(void);
 };
 
 class TestObj
@@ -63,6 +63,6 @@ public:
 
     void
         cb(void);
-    int test();
+    int test(void);
 };
 }

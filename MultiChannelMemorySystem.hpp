@@ -67,7 +67,7 @@ public:
     bool
         willAcceptTransaction(uint64_t addr);
     void
-        update();
+        update(void);
     void
         printStats(bool finalStats = false);
 

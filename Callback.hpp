@@ -40,7 +40,7 @@ template <typename ReturnT, typename Param1T, typename Param2T,
 {
 public:
     virtual
-        ~CallbackBase() = 0;
+        ~CallbackBase(void) = 0;
     virtual ReturnT
         operator()(Param1T, Param2T, Param3T) = 0;
 };

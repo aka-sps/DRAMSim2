@@ -78,7 +78,7 @@ public:
     void
         print(uint64_t currentClockCycle, bool dataStart);
     void
-        printData() const;
+        printData(void) const;
 
 };
 

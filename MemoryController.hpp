@@ -50,7 +50,7 @@ public:
                      CSVWriter &csvOut_,
                      std::ostream &dramsim_log_);
     virtual
-        ~MemoryController();
+        ~MemoryController(void);
 
     bool
         addTransaction(Transaction *trans);
