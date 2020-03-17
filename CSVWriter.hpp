@@ -36,6 +36,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <cinttypes>
 
 /** @file
  * CSVWriter: Writes CSV data with headers to an underlying ofstream 
@@ -149,7 +150,8 @@ public:
             finalized = true;
         } else {
             if (idx < fieldNames.size()) {
-                printf(" Number of fields doesn't match values (fields=%u, values=%u), check each value has a field name before it\n", idx, (unsigned)fieldNames.size());
+                printf(" Number of fields doesn't match values (fields=%u, values=%" PRIuPTR "u), check each value has a field name before it\n",
+                       idx, fieldNames.size());
             }
 
             idx = 0;
