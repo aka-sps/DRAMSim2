@@ -396,7 +396,7 @@ IniReader::CheckIfAllSet(void)
                 break;
 
             case BOOL:
-                *((bool *)configMap[i].variablePtr) = false;
+                *static_cast<bool*>(configMap[i].variablePtr) = false;
                 DEBUG("\tSetting Default: " << configMap[i].iniKey << "=false");
                 break;
 
@@ -426,7 +426,7 @@ IniReader::CheckIfAllSet(void)
                 continue;               \
             if (configMap[i].variableType != _typename) \
                 return -1;              \
-            *val = *(_type *)configMap[i].variablePtr;  \
+            *val = *static_cast<_type *>(configMap[i].variablePtr);  \
             return 0;                   \
         }                           \
         return -1;                      \
