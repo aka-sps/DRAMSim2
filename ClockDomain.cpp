@@ -43,8 +43,8 @@ ClockDomainCrosser::ClockDomainCrosser(double ratio, ClockUpdateCB *_callback)
             break;
         }
         /// @todo or, if the answers are the same as the last iteration, stop 
-        zs[i + 1] = 1.0f / (zs[i] - (int)floor(zs[i]));  // 1/(fractional part of z_i)
-        ds[i + 1] = ds[i] * (int)floor(zs[i + 1]) + ds[i - 1];
+        zs[i + 1] = 1.0f / (zs[i] - static_cast<int>(floor(zs[i])));  // 1 / (fractional part of z_i)
+        ds[i + 1] = ds[i] * static_cast<int>(floor(zs[i + 1])) + ds[i - 1];
         double const tmp = x*ds[i + 1];
         /// @todo fprem
         double const tmp2 = tmp - static_cast<int>(tmp);
