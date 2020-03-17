@@ -35,17 +35,17 @@
 #include <fstream>
 #include <string>
 
-#define RL (CL+AL)
-#define WL (RL-1)
+#define RL (CL + AL)
+#define WL (RL - 1)
 
 // same bank
-#define READ_TO_PRE_DELAY (AL+BL/2+ max(tRTP,tCCD)-tCCD)
-#define WRITE_TO_PRE_DELAY (WL+BL/2+tWR)
-#define READ_TO_WRITE_DELAY (RL+BL/2+tRTRS-WL)
-#define READ_AUTOPRE_DELAY (AL+tRTP+tRP)
-#define WRITE_AUTOPRE_DELAY (WL+BL/2+tWR+tRP)
-#define WRITE_TO_READ_DELAY_B (WL+BL/2+tWTR)  ///< interbank
-#define WRITE_TO_READ_DELAY_R (WL+BL/2+tRTRS-RL)  ///< interrank
+#define READ_TO_PRE_DELAY (AL + BL / 2+ max(tRTP,tCCD) - tCCD)
+#define WRITE_TO_PRE_DELAY (WL + BL / 2 + tWR)
+#define READ_TO_WRITE_DELAY (RL + BL / 2 + tRTRS - WL)
+#define READ_AUTOPRE_DELAY (AL + tRTP + tRP)
+#define WRITE_AUTOPRE_DELAY (WL + BL / 2 + tWR + tRP)
+#define WRITE_TO_READ_DELAY_B (WL + BL / 2 + tWTR)  ///< interbank
+#define WRITE_TO_READ_DELAY_R (WL + BL / 2 + tRTRS - RL)  ///< interrank
 
 namespace DRAMSim {
 enum TraceType
