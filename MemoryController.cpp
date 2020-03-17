@@ -34,7 +34,8 @@
 
 #include <algorithm>
 
-#define SEQUENTIAL(rank,bank) (rank*NUM_BANKS)+bank
+#define SEQUENTIAL(rank,bank) (rank * NUM_BANKS + bank)
+
 namespace DRAMSim {
 
 using namespace std;
@@ -712,8 +713,8 @@ MemoryController::printStats(bool finalStats)
         for (size_t j = 0; j < NUM_BANKS; ++j) {
             auto const sij = SEQUENTIAL(i, j);
 
-            bandwidth[sij] = (((double)(totalReadsPerBank[sij] + totalWritesPerBank[sij]) * (double)bytesPerTransaction) / (1024.0*1024.0*1024.0)) / secondsThisEpoch;
-            averageLatency[sij] = ((float)totalEpochLatency[sij] / (float)(totalReadsPerBank[sij])) * tCK;
+            bandwidth[sij] = (double(totalReadsPerBank[sij]) + totalWritesPerBank[sij]) * double(bytesPerTransaction) / (1024.0 * 1024.0 * 1024.0) / secondsThisEpoch;
+            averageLatency[sij] = float(totalEpochLatency[sij]) / float(totalReadsPerBank[sij]) * tCK;
             totalBandwidth += bandwidth[sij];
             totalReadsPerRank[i] += totalReadsPerBank[sij];
             totalWritesPerRank[i] += totalWritesPerBank[sij];
@@ -818,7 +819,7 @@ MemoryController::printStats(bool finalStats)
 
     }
 
-    PRINT(endl << " == Pending Transactions : " << pendingReadTransactions.size() << " (" << currentClockCycle << ")==");
+    PRINT(endl << " == Pending Transactions : " << pendingReadTransactions.size() << " (" << currentClockCycle << ") ==");
 #if 0
     for(size_t i=0;i<pendingReadTransactions.size();i++)
             {
