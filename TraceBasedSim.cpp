@@ -257,14 +257,17 @@ parseTraceFileLine(string &line,
 #ifndef NO_STORAGE
             if (dataStr.size() > 0 && transType == DATA_WRITE) {
                 // 32 bytes of data per transaction
-                dataBuffer = (uint64_t *)calloc(sizeof(uint64_t), 4);
-                size_t strlen = dataStr.size();
-                for (int i = 0; i < 4; i++) {
+                dataBuffer = static_cast<uint64_t *>(calloc(sizeof(uint64_t), 4));
+                auto strlen = dataStr.size();
+
+                for (int i = 0; i < 4; ++i) {
                     size_t startIndex = i * 16;
+
                     if (startIndex > strlen) {
                         break;
                     }
-                    size_t charsLeft = min(((size_t)16), strlen - startIndex + 1);
+
+                    size_t charsLeft = (std::min)(size_t(16), strlen - startIndex + 1);
                     string piece = dataStr.substr(i * 16, charsLeft);
                     istringstream iss(piece);
                     iss >> hex >> dataBuffer[i];
