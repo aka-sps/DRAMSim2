@@ -62,7 +62,7 @@ Bank::DataStruct *
 Bank::searchForRow(unsigned const row,
                    DataStruct *head)
 {
-    /// @todo use std::find
+    /// @todo use STL
     for (; head; head = head->next) {
         if (head->row == row) {
             break;
@@ -82,7 +82,7 @@ Bank::read(BusPacket *const busPacket)
         // the row hasn't been written before, so it isn't in the list
         // if(SHOW_SIM_OUTPUT) DEBUG("== Warning - Read from previously unwritten row " << busPacket->row);
         void *garbage = calloc(BL * (JEDEC_DATA_BUS_BITS / 8), 1);
-        /// @bug endian
+        /// @bug port endian
         static_cast<long *>(garbage)[0] = 0xdeadbeef;  // tracer value
         busPacket->data = garbage;
     } else {
