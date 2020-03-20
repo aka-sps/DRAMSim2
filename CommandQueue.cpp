@@ -613,7 +613,7 @@ CommandQueue::isEmpty(unsigned const rank)
         throw std::logic_error("Invalid Queueing Structure");
     }
 
-    /// @todo std::any/std::all
+    /// @todo using STL
     for (size_t i = 0; i < NUM_BANKS; ++i) {
         if (!q_rank[i].empty()) {
             return false;
