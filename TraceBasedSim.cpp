@@ -379,7 +379,7 @@ main(int argc, char **argv)
         }
         switch (c) {
         case 0:
-            /// @tod: figure out what the hell this does, cuz it never seems to get called
+            /// @todo figure out what the hell this does, cuz it never seems to get called
             if (long_options[option_index].flag != 0) {
                 // do nothing on a flag
                 printf("setting flag\n");
