@@ -47,11 +47,11 @@ set(HEADER_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/Transaction.hpp
 )
 
-add_library(dramsim ${SRC_FILES} ${HEADER_FILES})
+add_library(dramsim EXCLUDE_FROM_ALL ${SRC_FILES} ${HEADER_FILES})
 set_target_properties(dramsim PROPERTIES FOLDER "Libs")
 target_include_directories(dramsim PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(DRAMSimulator
+add_executable(DRAMSimulator EXCLUDE_FROM_ALL
     ${CMAKE_CURRENT_SOURCE_DIR}/TraceBasedSim.cpp
     ${SRC_FILES}
     ${HEADER_FILES}
@@ -63,7 +63,7 @@ if(DRAMSIM_NO_STORAGE)
     target_compile_definitions(DRAMSimulator PUBLIC NO_STORAGE)
 endif(DRAMSIM_NO_STORAGE)
 
-add_executable(dramsim_test
+add_executable(dramsim_test EXCLUDE_FROM_ALL
     ${CMAKE_CURRENT_SOURCE_DIR}/example_app/dramsim_test.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/example_app/dramsim_test.hpp
 )
