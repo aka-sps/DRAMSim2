@@ -1,7 +1,5 @@
 #include "SystemConfiguration.hpp"
 
-#include <fstream>
-
 namespace DRAMSim {
 std::ofstream cmd_verify_out; // used in Rank.cpp and MemoryController.cpp if VERIFICATION_OUTPUT is set
 
